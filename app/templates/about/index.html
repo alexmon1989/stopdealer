@@ -1,0 +1,33 @@
+{% extends "layout/master.html" %}
+
+{% block title %}{{ page_data.head_title }}{% endblock %}
+{% block meta_description %}{{ page_data.meta_description }}{% endblock %}
+{% block meta_keywords %}{{ page_data.meta_keywords }}{% endblock %}
+
+{% block content %}
+
+{% with active_page='about' %}
+{% include "layout/_partial/header.html" %}
+{% endwith %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="post">
+                    <div class="post-title">
+                        <h1>{{ page_data.title }}</h1>
+                    </div>
+                    <div class="post-body">
+                        {{ page_data.content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}

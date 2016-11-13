@@ -1,0 +1,14 @@
+<div class="footer">
+    <div class="container">
+    <ul class="pull-left footer-menu">
+        <li>
+            <a href="{{ url_for('home.index') }}"> Главная </a>
+            <a href="{{ url_for('about.index') }}"> Про сервис </a>
+            <a href="{{ url_for('contacts.index') }}"> Связаться с нами </a>
+        </li>
+    </ul>
+    <ul class="pull-right footer-menu">
+        <li> &copy; {{ date_now("%Y") }} </li>
+    </ul>
+    </div>
+</div>

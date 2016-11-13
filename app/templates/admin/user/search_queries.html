@@ -1,0 +1,73 @@
+{% extends 'admin/master.html' %}
+{% import 'admin/lib.html' as lib with context %}
+
+{% block body %}
+  {% block navlinks %}
+  <ul class="nav nav-tabs">
+    <li>
+        <a href="{{ return_url }}">{{ _gettext('List') }}</a>
+    </li>
+    {%- if admin_view.can_create -%}
+    <li>
+        <a href="{{ get_url('.create_view', url=return_url) }}">{{ _gettext('Create') }}</a>
+    </li>
+    {%- endif -%}
+    {%- if admin_view.can_edit -%}
+    <li>
+        <a href="{{ get_url('.edit_view', id=request.args.get('id'), url=return_url) }}">{{ _gettext('Edit') }}</a>
+    </li>
+    {%- endif -%}
+    {%- if admin_view.can_view_details -%}
+    <li>
+        <a href="{{ get_url('.details_view', id=request.args.get('id'), url=return_url) }}">{{ _gettext('Details') }}</a>
+    </li>
+    {%- endif -%}
+    <li class="active">
+        <a href="javascript:void(0)">Поисковые запросы ({{ search_queries_count }})</a>
+    </li>
+  </ul>
+  {% endblock %}
+
+  {% block details_table %}
+    <table class="table table-hover table-bordered" id="data">
+    <thead>
+        <tr>
+            <td><b>Запрос</b></td>
+            <td><b>Успех</b></td>
+            <td><b>Дата</b></td>
+        </tr>
+    </thead>
+    {% for x in search_queries %}
+      <tr>
+          <td>{{ x.phone }}</td>
+          <td>{% if x.success %}<b>Да</b>{% else %}Нет{% endif %}</td>
+          <td>{{ x.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endblock %}
+
+{% endblock %}
+
+{% block head_tail %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.6/jq-2.2.3/dt-1.10.12/datatables.min.css"/>
+    <style>
+        #data_wrapper {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block tail %}
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.6/jq-2.2.3/dt-1.10.12/datatables.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#data").DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Russian.json"
+                }
+            });
+        });
+    </script>
+{% endblock %}

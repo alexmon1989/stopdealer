@@ -1,0 +1,101 @@
+{% from "macros.html" import render_field with context %}
+
+{% extends "layout/master.html" %}
+
+{% block title %}{{ page_data.head_title }}{% endblock %}
+{% block meta_description %}{{ page_data.meta_description }}{% endblock %}
+{% block meta_keywords %}{{ page_data.meta_keywords }}{% endblock %}
+
+{% block content %}
+
+{% with active_page='contacts' %}
+{% include "layout/_partial/header.html" %}
+{% endwith %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="post">
+                    <div class="post-title">
+                        <h1>{{ page_data.title }}</h1>
+                    </div>
+                    <div class="post-body">
+                        {{ page_data.content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-sm-4">
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3>Контакты</h3>
+                    </div>
+                    <div class="widget-body">
+                        <address>
+                            <a href="mailto:email@example.com">email@example.com</a><br>
+                            Телефон : +38 (099) 555-66-77
+                        </address>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 col-sm-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="widget">
+                            <div class="widget-header">
+                                <h3>Отправить сообщение</h3>
+                            </div>
+                            <div class="widget-body">
+                                {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                        <div class="flashes-contacts">
+                                        {% for message in messages %}
+                                           {{ message }}<br>
+                                        {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <form method="post">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                            <p>Напишите нам</p>
+                                            <div class="row">
+                                                <div class="col-xs-4">
+                                                    {{ render_field(form.username, class='form-control input-lg') }}
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    {{ render_field(form.email, class='form-control input-lg') }}
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    {{ render_field(form.telephone, class='form-control input-lg') }}
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    {{ render_field(form.message, rows='5', class='form-control') }}
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <button class="btn btn-lg btn-custom pull-right">Отправить</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}

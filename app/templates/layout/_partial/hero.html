@@ -1,0 +1,22 @@
+<section class="hero">
+    <div class="container text-center">
+        <div class="hero-title">Поиск по номеру телефона</div>
+        <p class="hero-description hidden-xs">Найдите информацию о владельце авто по номеру телефона из объявления.
+            <br> Убедитесь, что имеете дело не с "перекупщиком".</p>
+        <div class="row hero-search-box">
+            <form action="{{ url_for('phone.index') }}" method="get">
+                <div class="col-md-8 col-sm-8 search-input">
+                    <input
+                        type="text"
+                        name="phone"
+                        class="form-control input-lg search-first"
+                        placeholder="Номер телефона продавца автомобиля"
+                        value="{{ phone_num }}">
+                </div>
+                <div class="col-md-4 col-sm-4 search-input">
+                    <button class="btn btn-custom btn-block btn-lg"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

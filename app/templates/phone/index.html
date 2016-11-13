@@ -1,0 +1,82 @@
+{% extends "layout/master.html" %}
+
+{% block title %}Информация по номеру {{ phone_num }}{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="post">
+                    <div class="post-title">
+                        <h1>Проверить автомобиль по телефону владельца {{ phone_num }}</h1>
+                    </div>
+                    <div class="post-body">
+                        <p><i>Имя владельца: {{ seller_name }}</i></p>
+
+                        <div class="search-results-box">
+                            <div class="row">
+                                <div class="col-md-12 search-results">
+                                    Всего объявлений: <span>{{ automobiles_count }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3>Информация о найденных объявлениях</h3>
+                    </div>
+                    <div class="widget-body">
+                        {% if automobiles %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Автомобиль</th>
+                                    <th>Год выпуска</th>
+                                    <th>Пробег</th>
+                                    <th>Город</th>
+                                    <th>Стоимость</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for auto in automobiles %}
+                                <tr>
+                                    <td>{{ auto.created_at.strftime('%d.%m.%Y') }}</td>
+                                    <td>{{ auto.props['manufacturer'] }}&nbsp;{{ auto.props['model'] }}</td>
+                                    <td>{{ auto.props['Год выпуска'] }}</td>
+                                    <td>{{ auto.props['Пробег'] }}</td>
+                                    <td>{{ auto.props['Город продажи'] }}</td>
+                                    <td>{{ '{:,}'.format(auto.get_price()).replace(',', ' ') }} руб.</td>
+                                    <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=auto.id) }}">Смотреть</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                            <p>Информация не найдена</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <p>Поиск по этому номеру производился <strong>{{ search_count }}</strong> раз.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}

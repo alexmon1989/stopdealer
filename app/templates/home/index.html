@@ -1,0 +1,39 @@
+{% extends "layout/master.html" %}
+{% set active_page = "home" %}
+
+{% block title %}{{ page_data.head_title }}{% endblock %}
+{% block meta_description %}{{ page_data.meta_description }}{% endblock %}
+{% block meta_keywords %}{{ page_data.meta_keywords }}{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+
+        {% include 'home/widgets/last_searches.html' %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="post">
+                    <div class="post-title">
+                        <h2>{{ page_data.title }}</h2>
+                    </div>
+                    <div class="post-body">
+                        {{ page_data.content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'home/widgets/see_also.html' %}
+
+    </div>
+</section>
+
+{% include 'home/widgets/counter.html' %}
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}

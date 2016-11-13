@@ -1,0 +1,8 @@
+{% extends 'admin/model/list.html' %}
+
+{% block list_row_actions %}
+    <a class="icon" href="{{ url_for('user.search_queries_view', id=get_pk_value(row), url=request.path) }}" title="Просмотр поисковых запросов пользователя">
+      <span class="fa fa-eye glyphicon glyphicon-search"></span>
+    </a>
+    {{ super() }}
+{% endblock %}

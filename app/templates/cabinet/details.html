@@ -1,0 +1,76 @@
+{% extends "layout/master.html" %}
+
+{% from "macros.html" import render_field with context %}
+
+{% block title %}Кабинет пользователя{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        {% include "_messages.html" %}
+
+        <div class="row">
+            {% include "cabinet/_partial/menu.html" %}
+
+            <div class="col-md-9 col-sm-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> Детали профиля </a> </h4>
+                    </div>
+
+                    <form accept-charset="utf-8" method="post" id="UserProfileForm" class="form-horizontal" autocomplete="off">
+                        <div class="panel-body">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Имя</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.username, class='form-control', with_label=True, value=current_user.username) }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">E-Mail</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.email, class='form-control', with_label=True, readonly='', value=current_user.email) }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Пароль</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.password, class='form-control', placeholder='Оставьте пустым, если не хотите менять') }}
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Подтверждение пароля</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.confirm_password, class='form-control', with_label=True) }}
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-custom"><i class="fa fa-save"></i> Сохранить изменения</button>
+                                    <button type="reset" class="btn btn-default"><i class="fa fa-close"></i> Сброс</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="index, follow">
+        <title>{% block title %}Определение перекупщиков по номеру телефона{% endblock %}</title>
+
+        <meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
+        <meta name="description" content="{% block meta_description %}{% endblock %}">
+
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:regular,700,600&amp;latin" type="text/css" />
+        <!-- Essential styles -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='plugins/font-awesome/css/font-awesome.css') }}" type="text/css">
+
+        <!-- Dlapak styles -->
+        <link id="theme_style" type="text/css" href="{{ url_for('static', filename='css/style1.css') }}" rel="stylesheet" media="screen">
+
+        <!-- Favicon -->
+        <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon" type="image/png">
+
+        <!-- Assets -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='plugins/owl-carousel/owl.carousel.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='plugins/owl-carousel/owl.theme.css') }}">
+
+        {% block styles %}{% endblock %}
+
+        <!-- JS Library -->
+        <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+
+    </head>
+    <body>
+        <div class="wrapper">
+            {% block content %}{% endblock %}
+        </div>
+        <!-- Essentials -->
+        <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='plugins/owl-carousel/owl.carousel.js') }}"></script>
+        <script src="{{ url_for('static', filename='plugins/counter/jquery.countTo.js') }}"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                // ===========Featured Owl Carousel============
+                if ($(".owl-carousel-featured").length > 0) {
+                    $(".owl-carousel-featured").owlCarousel({
+                        items: 3,
+                        lazyLoad: true,
+                        pagination: true,
+                        autoPlay: 5000,
+                        stopOnHover: true
+                    });
+                }
+
+                // ==================Counter====================
+                $('.item-count').countTo({
+                    formatter: function (value, options) {
+                        return value.toFixed(options.decimals);
+                    },
+                    onUpdate: function (value) {
+                        //console.debug(this);
+                    },
+                    onComplete: function (value) {
+                        //console.debug(this);
+                    }
+                });
+            });
+        </script>
+
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

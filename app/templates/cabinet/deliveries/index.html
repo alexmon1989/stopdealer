@@ -1,0 +1,83 @@
+{% extends "layout/master.html" %}
+
+{% from "macros.html" import render_field with context %}
+
+{% block title %}E-Mail рассылки{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        {% include "_messages.html" %}
+
+        <div class="row">
+            {% with active_cabinet_page='deliveries' %}
+                {% include "cabinet/_partial/menu.html" %}
+            {% endwith %}
+
+            <div class="col-md-9 col-sm-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> E-Mail рассылки </a> </h4>
+                    </div>
+
+                    <div class="panel-body">
+                        <p><a class="btn btn-custom" href="{{ url_for('cabinet.create_delivery') }}"><i class="fa fa-plus"></i> Создать</a></p>
+
+                        {% if deliveries_count %}
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th title="Производитель">Произв.</th>
+                                        <th>Модель</th>
+                                        <th>Год от</th>
+                                        <th>Год до</th>
+                                        <th>Цена от</th>
+                                        <th>Цена до</th>
+                                        <th>КПП</th>
+                                        <th title="Включено">Вкл.</th>
+                                        <th>Создано</th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for delivery in deliveries %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ delivery.manufacturer }}</td>
+                                        <td>{{ delivery.model }}</td>
+                                        <td>{{ delivery.year_from }}</td>
+                                        <td>{{ delivery.year_to }}</td>
+                                        <td>{{ delivery.price_from }}</td>
+                                        <td>{{ delivery.price_to }}</td>
+                                        <td>{{ delivery.transmission }}</td>
+                                        <td><a href="{{ url_for('cabinet.toggle_delivery_enabled', delivery_id=delivery.id) }}" title="{% if delivery.enabled %}Отключить{% else %}Включить{% endif %}">{% if delivery.enabled %}<b>Да</b>{% else %}Нет{% endif %}</a></td>
+                                        <td>{{ delivery.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                                        <td><a class="btn btn-danger btn-xs delete" href="{{ url_for('cabinet.delete_delivery', delivery_id=delivery.id) }}">Удалить</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                        {% else %}
+                            <p>Рассылки отсутствуют. Вы можете <a href="{{ url_for('cabinet.create_delivery') }}">создать</a> новую рассылку.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/pages/cabinet/deliveries.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "layout/master.html" %}
+
+{% block title %}Данные автомобиля {{ auto.props['manufacturer'] }} {{ auto.props['model'] }} {{ auto.props['Год выпуска'] }} г.в.{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="post automobile">
+                    <div class="post-title">
+                        <h1>Данные объявления по автомобилю <strong>{{ auto.props['manufacturer'] }} {{ auto.props['model'] }} {{ auto.props['Год выпуска'] }} г.в.</strong></h1>
+                    </div>
+                    <div class="post-body">
+                        <p>Объявление на сайте <strong>auto.e1.ru</strong>: <a title="Ссылка откроется в новой вкладке" target="_blank" rel="nofollow" href="https://auto.e1.ru/car/used/manufacturer/model/{{ auto.e1_id }}">открыть</a>.</p>
+
+                        <h3>Характеристики</h3>
+
+                        <dl class="dl-horizontal">
+                            {% for key, value in auto.props.items() %}
+                                {% if key not in ['manufacturer', 'model'] %}
+                                <dt>{{ key }}</dt>
+                                <dd>
+                                    {{ value }}
+                                    {% if 'VIN' in key %}
+                                        <a href="http://www.gibdd.ru/check/auto/" rel="nofollow" target="_blank">проверить авто</a>
+                                    {% endif %}
+                                </dd>
+                                {% endif %}
+                            {% endfor %}
+                        </dl>
+
+                        <h3>Владелец</h3>
+
+                        <dl class="dl-horizontal">
+                            <dt>Имя</dt>
+                            <dd>{{ auto.seller.name or '<i>Нет данных</i>'|safe }}</dd>
+                            <dt>Телефон</dt>
+                            <dd><a href="{{ url_for('phone.index', phone=auto.seller.phone) }}">{{ auto.seller.phone }}</a></dd>
+                        </dl>
+
+                        <h3>Динамика цен</h3>
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Цена</th>
+                                    <th>Пробег</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for price in prices %}
+                                <tr>
+                                    <td>{{ price.created_at.strftime('%d.%m.%Y') }}</td>
+                                    <td>{{ '{:,}'.format(price.value|int).replace(',', ' ') }} руб.</td>
+                                    <td>
+                                        {% if price.mileage %}
+                                            {% if price.mileage != 'нет данных' %}
+                                                {{ '{:,}'.format(price.mileage|int).replace(',', ' ') }} км
+                                            {% endif %}
+                                        {% else %}
+                                            {% if auto.props['Пробег'] %}
+                                                {{ auto.props['Пробег'] }}
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}

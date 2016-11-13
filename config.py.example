@@ -1,0 +1,114 @@
+# Statement for enabling the development environment
+DEBUG = True
+DEBUG_MONGO = False
+
+# Define the application directory
+import os
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# Application threads. A common general assumption is
+# using 2 per available processor cores - to handle
+# incoming requests using one and performing background
+# operations using the other.
+THREADS_PER_PAGE = 2
+
+# Secret key for signing cookies
+SECRET_KEY = "secret"
+
+# Debugger
+DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# CSRF
+CSRF_ENABLED = True
+WTF_CSRF_ENABLED = True
+
+# DB
+MONGODB_DB = 'e1_automobiles'
+
+MAIL_SERVER = 'mailtrap.io'
+MAIL_PORT = 2525
+MAIL_USERNAME = '69a353efe26b2e'
+MAIL_PASSWORD = '9b65ef3c473e8d'
+MAIL_DEFAULT_SENDER = 'info@example.com'
+
+# Flask-Security
+SECURITY_PASSWORD_HASH = 'sha512_crypt'
+SECURITY_PASSWORD_SALT = 'secret_salt'
+SECURITY_TRACKABLE = True
+SECURITY_REGISTERABLE = True
+SECURITY_RECOVERABLE = True
+SECURITY_POST_LOGIN_VIEW = '/cabinet/details'
+SECURITY_POST_REGISTER_VIEW = '/cabinet/details'
+SECURITY_POST_RESET_VIEW = '/cabinet/details'
+
+# Flask-Security Messages
+SECURITY_MSG_UNAUTHORIZED = (
+        'У вас нету прав для доступа к этому ресурсу.', 'error')
+SECURITY_MSG_CONFIRM_REGISTRATION = (
+        'Thank you. Confirmation instructions have been sent to %(email)s.', 'success')
+SECURITY_MSG_EMAIL_CONFIRMED = (
+        'Thank you. Your email has been confirmed.', 'success')
+SECURITY_MSG_ALREADY_CONFIRMED = (
+        'Your email has already been confirmed.', 'info')
+SECURITY_MSG_INVALID_CONFIRMATION_TOKEN = (
+        'Invalid confirmation token.', 'error')
+SECURITY_MSG_EMAIL_ALREADY_ASSOCIATED = (
+        '%(email)s уже используется.', 'error')
+SECURITY_MSG_PASSWORD_MISMATCH = (
+        'Password does not match', 'error')
+SECURITY_MSG_RETYPE_PASSWORD_MISMATCH = (
+        'Пароли не совпадают', 'error')
+SECURITY_MSG_INVALID_REDIRECT = (
+        'Redirections outside the domain are forbidden', 'error')
+SECURITY_MSG_PASSWORD_RESET_REQUEST = (
+        'Инструкции по сбросу вашего пароля были высланы на адрес %(email)s.', 'info')
+SECURITY_MSG_PASSWORD_RESET_EXPIRED = (
+        'You did not reset your password within %(within)s. New instructions have been sent '
+        'to %(email)s.', 'error')
+SECURITY_MSG_INVALID_RESET_PASSWORD_TOKEN = (
+        'Invalid reset password token.', 'error')
+SECURITY_MSG_CONFIRMATION_REQUIRED = (
+        'Email requires confirmation.', 'error')
+SECURITY_MSG_CONFIRMATION_REQUEST = (
+        'Confirmation instructions have been sent to %(email)s.', 'info')
+SECURITY_MSG_CONFIRMATION_EXPIRED = (
+        'You did not confirm your email within %(within)s. New instructions to confirm your email '
+        'have been sent to %(email)s.', 'error')
+SECURITY_MSG_LOGIN_EXPIRED = (
+        'You did not login within %(within)s. New instructions to login have been sent to '
+        '%(email)s.', 'error')
+SECURITY_MSG_LOGIN_EMAIL_SENT = (
+        'Instructions to login have been sent to %(email)s.', 'success')
+SECURITY_MSG_INVALID_LOGIN_TOKEN = (
+        'Invalid login token.', 'error')
+SECURITY_MSG_DISABLED_ACCOUNT = (
+        'Профиль пользователя не активен.', 'error')
+SECURITY_MSG_EMAIL_NOT_PROVIDED = (
+        'Введите ваш e-mail', 'error')
+SECURITY_MSG_INVALID_EMAIL_ADDRESS = (
+        'Неверный e-mail', 'error')
+SECURITY_MSG_PASSWORD_NOT_PROVIDED = (
+        'Введите пароль', 'error')
+SECURITY_MSG_PASSWORD_NOT_SET = (
+        'No password is set for this user', 'error')
+SECURITY_MSG_PASSWORD_INVALID_LENGTH = (
+        'Пароль должен содержать минимум 6 символов', 'error')
+SECURITY_MSG_USER_DOES_NOT_EXIST = (
+        'Пользователь не существует', 'error')
+SECURITY_MSG_INVALID_PASSWORD = (
+        'Неверный пароль', 'error')
+SECURITY_MSG_PASSWORDLESS_LOGIN_SUCCESSFUL = (
+        'Вы успешно авторизировались.', 'success')
+SECURITY_MSG_PASSWORD_RESET = (
+        'Вы успешно изменили ваш пароль и были автоматически авторизированы.',
+        'success')
+SECURITY_MSG_PASSWORD_IS_THE_SAME = (
+        'Your new password must be different than your previous password.', 'error')
+SECURITY_MSG_PASSWORD_CHANGE = (
+        'You successfully changed your password.', 'success')
+SECURITY_MSG_LOGIN = (
+        'Для доступа к этой странице необходимо авторизироваться.', 'info')
+SECURITY_MSG_REFRESH = (
+        'Please reauthenticate to access this page.', 'info')
+SECURITY_EMAIL_SUBJECT_PASSWORD_RESET = 'Сброс пароля'
+SECURITY_EMAIL_SUBJECT_PASSWORD_NOTICE = 'Ваш пароль был изменён'

@@ -1,0 +1,140 @@
+{% extends "layout/master.html" %}
+
+{% from "macros.html" import render_field, render_pagination with context %}
+
+{% block title %}Подешевевшие авто - страница {{ page }}{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        {% include "_messages.html" %}
+
+        <div class="row">
+            {% with active_cabinet_page='cheapened_autos' %}
+                {% include "cabinet/_partial/menu.html" %}
+            {% endwith %}
+
+            <div class="col-md-9 col-sm-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Фильтры</h4>
+                    </div>
+
+                    <form accept-charset="utf-8" action="{{ url_for('cabinet.cheapened_autos') }}" method="get" class="form-horizontal" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Производитель</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.manufacturer, class='form-control') }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Модель</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.model, class='form-control') }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Год выпуска</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            {{ render_field(form.year_from, class='form-control') }}
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {{ render_field(form.year_to, class='form-control') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Подешевел на</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            {{ render_field(form.fell_by_from, class='form-control') }}
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {{ render_field(form.fell_by_to, class='form-control') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Подешевел когда</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            {{ render_field(form.fell_by_date_from, class='form-control') }}
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {{ render_field(form.fell_by_date_to, class='form-control') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-custom"><i class="fa fa-search"></i> Поиск</button>
+                                    <button type="reset" class="btn btn-default"><i class="fa fa-close"></i> Сброс</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Результаты</h4>
+                    </div>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Автомобиль</th>
+                                <th>Год выпуска</th>
+                                <th>Подешевел на</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cheapened_autos.items %}
+                            <tr>
+                                <td>{{ item.created_at.strftime('%d.%m.%Y') }}</td>
+                                <td>{{ item.automobile.props['manufacturer'] }}&nbsp;{{ item.automobile.props['model'] }}</td>
+                                <td>{{ item.automobile.props['Год выпуска'] }} г.в.</td>
+                                <td>{{ item.fell_by }} руб.</td>
+                                <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=item.automobile._id) }}">Смотреть</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="text-center">{{ render_pagination(cheapened_autos, 'cabinet.cheapened_autos') }}</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='plugins/moment/min/moment-with-locales.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pages/cabinet/cheapened_autos.js') }}"></script>
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
+{% endblock %}
