@@ -955,3 +955,21 @@ ul.author-menus > li.active a {
   	_overflow: auto;
 	margin-bottom: 20px;
 }
+
+@media screen and (max-device-width: 450px) {
+	.navbar-brand img {
+		width: 230px;
+	}
+}
+
+@media screen and (min-device-width: 451px) {
+	.navbar-brand img {
+		width: 300px;
+	}
+}
+
+@media screen and (min-device-width: 980px) {
+	.navbar-brand img {
+		width: 330px;
+	}
+}
