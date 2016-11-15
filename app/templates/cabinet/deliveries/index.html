@@ -28,40 +28,42 @@
                         <p><a class="btn btn-custom" href="{{ url_for('cabinet.create_delivery') }}"><i class="fa fa-plus"></i> Создать</a></p>
 
                         {% if deliveries_count %}
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th title="Производитель">Произв.</th>
-                                        <th>Модель</th>
-                                        <th>Год от</th>
-                                        <th>Год до</th>
-                                        <th>Цена от</th>
-                                        <th>Цена до</th>
-                                        <th>КПП</th>
-                                        <th title="Включено">Вкл.</th>
-                                        <th>Создано</th>
-                                        <th>&nbsp;</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for delivery in deliveries %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td>{{ delivery.manufacturer }}</td>
-                                        <td>{{ delivery.model }}</td>
-                                        <td>{{ delivery.year_from }}</td>
-                                        <td>{{ delivery.year_to }}</td>
-                                        <td>{{ delivery.price_from }}</td>
-                                        <td>{{ delivery.price_to }}</td>
-                                        <td>{{ delivery.transmission }}</td>
-                                        <td><a href="{{ url_for('cabinet.toggle_delivery_enabled', delivery_id=delivery.id) }}" title="{% if delivery.enabled %}Отключить{% else %}Включить{% endif %}">{% if delivery.enabled %}<b>Да</b>{% else %}Нет{% endif %}</a></td>
-                                        <td>{{ delivery.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
-                                        <td><a class="btn btn-danger btn-xs delete" href="{{ url_for('cabinet.delete_delivery', delivery_id=delivery.id) }}">Удалить</a></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                            <div class="table-container">
+                                <table class="table table-striped no-margin">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th title="Производитель">Произв.</th>
+                                            <th>Модель</th>
+                                            <th>Год от</th>
+                                            <th>Год до</th>
+                                            <th>Цена от</th>
+                                            <th>Цена до</th>
+                                            <th>КПП</th>
+                                            <th title="Включено">Вкл.</th>
+                                            <th>Создано</th>
+                                            <th>&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for delivery in deliveries %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td>{{ delivery.manufacturer }}</td>
+                                            <td>{{ delivery.model }}</td>
+                                            <td>{{ delivery.year_from }}</td>
+                                            <td>{{ delivery.year_to }}</td>
+                                            <td>{{ delivery.price_from }}</td>
+                                            <td>{{ delivery.price_to }}</td>
+                                            <td>{{ delivery.transmission }}</td>
+                                            <td><a href="{{ url_for('cabinet.toggle_delivery_enabled', delivery_id=delivery.id) }}" title="{% if delivery.enabled %}Отключить{% else %}Включить{% endif %}">{% if delivery.enabled %}<b>Да</b>{% else %}Нет{% endif %}</a></td>
+                                            <td>{{ delivery.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                                            <td><a class="btn btn-danger btn-xs delete" href="{{ url_for('cabinet.delete_delivery', delivery_id=delivery.id) }}">Удалить</a></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
 
                         {% else %}
                             <p>Рассылки отсутствуют. Вы можете <a href="{{ url_for('cabinet.create_delivery') }}">создать</a> новую рассылку.</p>
@@ -78,6 +80,12 @@
 
 {% endblock %}
 
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.css') }}" />
+{% endblock %}
+
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/pages/cabinet/deliveries.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pages/cabinet/deliveries-index.js') }}"></script>
 {% endblock %}

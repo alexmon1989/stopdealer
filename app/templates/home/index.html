@@ -37,3 +37,22 @@
 {% include 'layout/_partial/footer.html' %}
 
 {% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.css') }}" />
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+    <script>
+        $(function () {
+            $(".table-container").mCustomScrollbar({
+                axis:"x",
+                theme: 'dark-3',
+                scrollButtons: {
+                    enable: true
+                }
+            });
+        });
+    </script>
+{% endblock %}

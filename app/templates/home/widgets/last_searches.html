@@ -5,32 +5,34 @@
                 <h3>Последние поиски</h3>
             </div>
             <div class="widget-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Время</th>
-                            <th>Запрос</th>
-                            <th>Автомобиль владельца</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for search in last_searches %}
-                        <tr>
-                            <td>{{ search.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
-                            <td><strong>{{ search.phone }}</strong></td>
-                            <td>
-                                {% if search.last_automobile %}
-                                {{ search.last_automobile.props['manufacturer'] }}&nbsp;{{ search.last_automobile.props['model'] }}
-                                {% else %}
-                                    <i>Нет информации</i>
-                                {% endif %}
-                            </td>
-                            <td><a class="btn btn-custom btn-block" href="{{ url_for('phone.index', phone=search.phone) }}">Смотреть</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table table-striped no-margin">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Запрос</th>
+                                <th>Автомобиль владельца</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for search in last_searches %}
+                            <tr>
+                                <td>{{ search.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                                <td><strong>{{ search.phone }}</strong></td>
+                                <td>
+                                    {% if search.last_automobile %}
+                                    {{ search.last_automobile.props['manufacturer'] }}&nbsp;{{ search.last_automobile.props['model'] }}
+                                    {% else %}
+                                        <i>Нет информации</i>
+                                    {% endif %}
+                                </td>
+                                <td><a class="btn btn-custom btn-block" href="{{ url_for('phone.index', phone=search.phone) }}">Смотреть</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

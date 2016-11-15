@@ -17,28 +17,30 @@
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="become_cheaper">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Автомобиль</th>
-                                    <th>Год выпуска</th>
-                                    <th>Подешевел на</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in cheapened_autos %}
-                                <tr>
-                                    <td>{{ item.created_at.strftime('%d.%m.%Y') }}</td>
-                                    <td>{{ item.automobile.props['manufacturer'] }}&nbsp;{{ item.automobile.props['model'] }}</td>
-                                    <td>{{ item.automobile.props['Год выпуска'] }} г.в.</td>
-                                    <td>{{ item.fell_by }} руб.</td>
-                                    <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=item.automobile._id) }}">Смотреть</a></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="table-container">
+                            <table class="table table-striped no-margin">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Автомобиль</th>
+                                        <th>Год выпуска</th>
+                                        <th>Подешевел на</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cheapened_autos %}
+                                    <tr>
+                                        <td>{{ item.created_at.strftime('%d.%m.%Y') }}</td>
+                                        <td>{{ item.automobile.props['manufacturer'] }}&nbsp;{{ item.automobile.props['model'] }}</td>
+                                        <td>{{ item.automobile.props['Год выпуска'] }} г.в.</td>
+                                        <td>{{ item.fell_by }} руб.</td>
+                                        <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=item.automobile._id) }}">Смотреть</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="popular_articles">
                         {% for article in popular_articles %}
@@ -69,24 +71,26 @@
                     <div role="tabpanel" class="tab-pane" id="your_searches">
                         {% if current_user.is_authenticated %}
                             {% if last_searches_user %}
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Дата</th>
-                                        <th>Номер телефона</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for search in last_searches_user  %}
-                                    <tr>
-                                        <td>{{ search.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
-                                        <td>{{ search.phone }}</td>
-                                        <td><a class="btn btn-custom btn-block" href="{{ url_for('phone.index', phone=search.phone) }}">Повторить поиск</a></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                            <div class="table-container mCustomScrollbar" data-mcs-axis="x" data-mcs-theme="3d-thick-dark">
+                                <table class="table table-striped no-margin">
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Номер телефона</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for search in last_searches_user  %}
+                                        <tr>
+                                            <td>{{ search.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                                            <td>{{ search.phone }}</td>
+                                            <td><a class="btn btn-custom btn-block" href="{{ url_for('phone.index', phone=search.phone) }}">Повторить поиск</a></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                             {% else %}
                                 <p>Вы ещё ничего не искали.</p>
                             {% endif %}

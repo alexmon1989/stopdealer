@@ -948,3 +948,10 @@ ul.errors > li {
 ul.author-menus > li.active a {
 	color: #58b325;
 }
+
+.table-container {
+	width: 100%;
+  	overflow-y: auto;
+  	_overflow: auto;
+	margin-bottom: 20px;
+}
