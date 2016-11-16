@@ -1,9 +1,10 @@
 from .models import User, Blog, Page, Search, Delivery
 from wtforms import TextAreaField, PasswordField, validators
 from wtforms.widgets import TextArea
-from flask import url_for, redirect, request, abort
+from flask import url_for, redirect, request, abort, flash
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.base import MenuLink
+from flask_admin.babel import gettext
 from flask_admin.contrib.mongoengine import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_security import current_user
@@ -12,7 +13,10 @@ from flask_wtf import FlaskForm
 from slugify import slugify
 import datetime
 import os.path as op
-from flask_admin.contrib.mongoengine.filters import BaseMongoEngineFilter, FilterEqual
+from flask_admin.contrib.mongoengine.filters import BaseMongoEngineFilter
+from flask_admin.form import FormOpts
+from flask_admin.helpers import get_redirect_target
+from flask_admin.model.helpers import get_mdict_item_or_list
 
 
 # CKEditor
@@ -273,17 +277,23 @@ class AdminBlogModelView(MyModelView):
 class AdminPagesModelView(MyModelView):
     form_base_class = FlaskForm
     form_overrides = {
-        'content': CKTextAreaField
+        'content': CKTextAreaField,
+        'contact_widget_content': CKTextAreaField
     }
     create_template = 'create.html'
     edit_template = 'edit.html'
-    can_view_details = True
     can_create = False
     can_delete = False
-    column_exclude_list = ('content', 'head_title', 'meta_description', 'meta_keywords')
+    column_exclude_list = ('content',
+                           'head_title',
+                           'meta_description',
+                           'meta_keywords',
+                           'contact_form_email',
+                           'contact_widget_content')
     form_excluded_columns = ('created_at', 'updated_at')
     column_labels = dict(title='Название',
                          content='Содержание',
+                         head_title='Title страницы',
                          created_at='Создано',
                          updated_at='Последнее редактирование')
     column_formatters = dict(created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
@@ -303,8 +313,12 @@ class AdminPagesModelView(MyModelView):
         'meta_description': {
             'label': 'Description страницы',
         },
-        'meta_keywords': {
-            'label': 'Ключевые слова (keywords)',
+        'contact_form_email': {
+            'label': 'E-Mail, на который отправляется форма',
+            'validators': [validators.email()]
+        },
+        'contact_widget_content': {
+            'label': 'Текст виджета "Контакты"',
         }
     }
     form_widget_args = {
@@ -316,6 +330,12 @@ class AdminPagesModelView(MyModelView):
     def on_model_change(self, form, model, is_created):
         model.slug = Page.objects(id=model.id).only('slug').first()['slug']
         model.updated_at = datetime.datetime.now
+
+    def on_form_prefill(self, form, id):
+        page = Page.objects(id=id).first()
+        if page.slug != 'contacts':
+            del form.contact_form_email
+            del form.contact_widget_content
 
 
 class FilterUserId(BaseMongoEngineFilter):

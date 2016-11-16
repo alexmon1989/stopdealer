@@ -38,12 +38,14 @@ class Automobile(db.Document):
 
 
 class Page(db.Document):
-    slug = db.StringField(unique=True)
-    title = db.StringField()
+    slug = db.StringField(max_length=255, unique=True)
+    title = db.StringField(max_length=255)
     content = db.StringField()
-    head_title = db.StringField()
+    head_title = db.StringField(max_length=255)
     meta_description = db.StringField(default="")
     meta_keywords = db.StringField(default="")
+    contact_form_email = db.StringField(max_length=255, default=None)
+    contact_widget_content = db.StringField(default=None)
     created_at = db.DateTimeField(default=datetime.datetime.now)
     updated_at = db.DateTimeField(default=datetime.datetime.now)
 

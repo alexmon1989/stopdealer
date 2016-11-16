@@ -34,7 +34,9 @@ def seed_pages():
         slug='contacts',
         title="Техническая поддержка и сотрудничество",
         content="<p>Мы с удовольствием ответим на все ваши вопросы и предложения. Данные для контакта вы можете найти на этой странице немного ниже, а также у вас есть возможность отправить нам письмо прямо с сайта через форму связи.</p>",
-        head_title="Контакты"
+        head_title="Контакты",
+        contact_form_email="info@stopdealer.com",
+        contact_widget_content="<p><a href=\"mailto:info@stopdealer.com\">info@stopdealer.com</a><br />Телефон : +38 (099) 555-66-77</p>"
     ).save()
     Page(
         slug='prices',
