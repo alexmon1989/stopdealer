@@ -30,7 +30,8 @@ def index():
             <strong>Сообщение:</strong> {3}
         '''.format(form.username.data, form.email.data, form.telephone.data, form.message.data)
         msg.attach(MIMEText(html, 'html'))
-        s = smtplib.SMTP(current_app.config['MAIL_SERVER'], current_app.config['MAIL_PORT'])
+        s = smtplib.SMTP_SSL(current_app.config['MAIL_SERVER'], current_app.config['MAIL_PORT'])
+        s.login(current_app.config['MAIL_USERNAME'], current_app.config['MAIL_PASSWORD'])
         s.send_message(msg)
         s.quit()
         flash('Сообщение успешно отправлено. Наши менеджеры свяжутся с вами в ближайшее время.')
