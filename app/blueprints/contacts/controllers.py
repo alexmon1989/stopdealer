@@ -30,8 +30,12 @@ def index():
             <strong>Сообщение:</strong> {3}
         '''.format(form.username.data, form.email.data, form.telephone.data, form.message.data)
         msg.attach(MIMEText(html, 'html'))
-        s = smtplib.SMTP_SSL(current_app.config['MAIL_SERVER'], current_app.config['MAIL_PORT'])
-        s.login(current_app.config['MAIL_USERNAME'], current_app.config['MAIL_PASSWORD'])
+        if current_app.config['MAIL_USE_SSL']:
+            s = smtplib.SMTP_SSL(current_app.config['MAIL_SERVER'], current_app.config['MAIL_PORT'])
+        else:
+            s = smtplib.SMTP(current_app.config['MAIL_SERVER'], current_app.config['MAIL_PORT'])
+        if current_app.config['MAIL_USERNAME'] and current_app.config['MAIL_PASSWORD']:
+            s.login(current_app.config['MAIL_USERNAME'], current_app.config['MAIL_PASSWORD'])
         s.send_message(msg)
         s.quit()
         flash('Сообщение успешно отправлено. Наши менеджеры свяжутся с вами в ближайшее время.')
