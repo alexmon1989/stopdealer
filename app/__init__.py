@@ -39,7 +39,10 @@ def create_app(**config_overrides):
     db.init_app(app)
 
     # Setup Flask-Security
-    security = Security(app, user_datastore, register_form=ExtendedRegisterForm)
+    security = Security(app,
+                        user_datastore,
+                        confirm_register_form=ExtendedRegisterForm,
+                        register_form=ExtendedRegisterForm)
 
     # Обработчик сигнала регистрации пользователя (высылает смс для подтверждения)
     @user_registered.connect_via(app)

@@ -1,0 +1,7 @@
+Добро пожаловать, {{ user.email }}!
+
+{% if security.confirmable %}
+Пожалуйста, подтвердите ваш e-mail, перейдя по следующей ссылке:
+
+{{ confirmation_link }}
+{% endif %}

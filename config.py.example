@@ -34,22 +34,30 @@ MAIL_DEFAULT_SENDER = 'info@example.com'
 # Flask-Security
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
 SECURITY_PASSWORD_SALT = 'secret_salt'
+SECURITY_CONFIRM_SALT = 'confirm_salt'
+SECURITY_RESET_SALT = 'reset_salt'
+SECURITY_LOGIN_SALT = 'login_salt'
+SECURITY_REMEMBER_SALT = 'remember_salt'
 SECURITY_TRACKABLE = True
 SECURITY_REGISTERABLE = True
 SECURITY_RECOVERABLE = True
+SECURITY_CONFIRMABLE = True
 SECURITY_POST_LOGIN_VIEW = '/cabinet/details'
 SECURITY_POST_REGISTER_VIEW = '/cabinet/details'
 SECURITY_POST_RESET_VIEW = '/cabinet/details'
+SECURITY_EMAIL_SENDER = 'info@stopdealer.ru'
+SECURITY_EMAIL_SUBJECT_REGISTER = 'Добро пожаловать'
+SECURITY_EMAIL_SUBJECT_CONFIRM = 'Пожалуйста, подтвердите ваш e-mail'
 
 # Flask-Security Messages
 SECURITY_MSG_UNAUTHORIZED = (
         'У вас нету прав для доступа к этому ресурсу.', 'error')
 SECURITY_MSG_CONFIRM_REGISTRATION = (
-        'Thank you. Confirmation instructions have been sent to %(email)s.', 'success')
+        'Спасибо. Инструкции для подтверждения e-mail были высланы на адрес %(email)s.', 'success')
 SECURITY_MSG_EMAIL_CONFIRMED = (
-        'Thank you. Your email has been confirmed.', 'success')
+        'Спасибо. Ваша учётная запись подтверждена.', 'success')
 SECURITY_MSG_ALREADY_CONFIRMED = (
-        'Your email has already been confirmed.', 'info')
+        'Ваша учётная запись уже подтверждена.', 'info')
 SECURITY_MSG_INVALID_CONFIRMATION_TOKEN = (
         'Invalid confirmation token.', 'error')
 SECURITY_MSG_EMAIL_ALREADY_ASSOCIATED = (
@@ -68,12 +76,12 @@ SECURITY_MSG_PASSWORD_RESET_EXPIRED = (
 SECURITY_MSG_INVALID_RESET_PASSWORD_TOKEN = (
         'Invalid reset password token.', 'error')
 SECURITY_MSG_CONFIRMATION_REQUIRED = (
-        'Email requires confirmation.', 'error')
+        'E-mail нуждается в подтверждении.', 'error')
 SECURITY_MSG_CONFIRMATION_REQUEST = (
-        'Confirmation instructions have been sent to %(email)s.', 'info')
+        'Инструкции для подтверждения e-mail были высланы на ваш электронный адрес %(email)s.', 'info')
 SECURITY_MSG_CONFIRMATION_EXPIRED = (
-        'You did not confirm your email within %(within)s. New instructions to confirm your email '
-        'have been sent to %(email)s.', 'error')
+        'Вы не подтвердили ваш адрес e-mail на протяжении %(within)s дней. новые инструкции были высланы '
+        'на ваш адрес %(email)s.', 'error')
 SECURITY_MSG_LOGIN_EXPIRED = (
         'You did not login within %(within)s. New instructions to login have been sent to '
         '%(email)s.', 'error')

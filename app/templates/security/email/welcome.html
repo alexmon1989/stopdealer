@@ -1,0 +1,7 @@
+<p>Добро пожаловать, {{ user.email }}!</p>
+
+{% if security.confirmable %}
+<p>Пожалуйста, подтвердите ваш e-mail, перейдя по следующей ссылке:</p>
+
+<p><a href="{{ confirmation_link }}">Подтвердить e-mail</a></p>
+{% endif %}
