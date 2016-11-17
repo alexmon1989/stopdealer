@@ -27,11 +27,13 @@ if __name__ == '__main__':
                 if delivery.transmission:
                     automobiles = automobiles.filter(automobile_props__transmission=delivery.transmission)
 
+                print(automobiles)
+
                 # Формирование письма и его отправка
                 if automobiles:
-                    msg = Message("Рассылка объявлений по {} {}".format(delivery.manufacturer, delivery.model),
-                                  recipients=['monastyretsky@mail.ru'], sender='alex.mon1989@gmail.com')
-                    msg.html = '<b>Добрый день!</b>'
+                    msg = Message("Рассылка объявлений: {} {}".format(delivery.manufacturer, delivery.model),
+                                  recipients=[delivery.user_id.email])
+                    msg.html = '<b>Добрый день, {}!</b>'.format(delivery.user_id.username)
                     msg.html += '<p></p>'
                     msg.html += '<p>Обнаружены следующие объявления на сайте e1.auto.ru:</p>'
                     msg.html += '<ol>'
