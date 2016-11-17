@@ -27,11 +27,9 @@ if __name__ == '__main__':
                 if delivery.transmission:
                     automobiles = automobiles.filter(automobile_props__transmission=delivery.transmission)
 
-                print(automobiles)
-
                 # Формирование письма и его отправка
                 if automobiles:
-                    msg = Message("Рассылка объявлений: {} {}".format(delivery.manufacturer, delivery.model),
+                    msg = Message("{} {}".format(delivery.manufacturer, delivery.model),
                                   recipients=[delivery.user_id.email])
                     msg.html = '<b>Добрый день, {}!</b>'.format(delivery.user_id.username)
                     msg.html += '<p></p>'
@@ -46,8 +44,9 @@ if __name__ == '__main__':
                             '<a href="https://auto.e1.ru/car/used/manufacturer/model/{}">auto.e1.ru</a>'.format(
                                 auto.automobile.e1_id
                             ),
-                            '<a href="{}">нашем сайте</a>'.format(
-                                url_for('automobile.index', auto_id=auto.automobile.id)
+                            '<a href="{}">{}</a>'.format(
+                                url_for('automobile.index', auto_id=auto.automobile.id),
+                                app.config['SERVER_NAME']
                             )
                         )
                     msg.html += '</ol>'
