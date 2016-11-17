@@ -137,8 +137,8 @@ def create_delivery():
                  model=form.model.data,
                  year_from=form.year_from.data,
                  year_to=form.year_to.data,
-                 price_from=form.price_from.data,
-                 price_to=form.price_to.data,
+                 price_from=form.price_from.data.replace(' ', ''),
+                 price_to=form.price_to.data.replace(' ', ''),
                  transmission=form.transmission.data
                  ).save()
 
