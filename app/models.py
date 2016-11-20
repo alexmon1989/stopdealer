@@ -20,12 +20,12 @@ class Automobile(db.Document):
     meta = {'collection': 'automobiles'}
 
     @staticmethod
-    def get_seller_phones():
+    def get_seller_phones_count():
         """Взвращает список телефонов продавцов"""
         res = cache.get('seller-phones')
         if res is None:
-            res = Automobile.objects(seller__phone__ne=None).distinct('seller.phone')
-            cache.set('seller-phones', res)
+            res = len(Automobile.objects(seller__phone__ne=None).distinct('seller.phone'))
+            cache.set('seller-phones', res, timeout=24*60*60)
         return res
 
     def get_price(self):

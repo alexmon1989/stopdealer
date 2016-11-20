@@ -23,7 +23,7 @@ def index():
 
     # Данные для виджета counter
     auto_count = Automobile.objects.count()
-    sellers_phones = Automobile.get_seller_phones()
+    sellers_count = Automobile.get_seller_phones_count()
 
     # Последние поиски:
     last_searches = Search.objects(success=True).order_by('-created_at')[:5]
@@ -38,7 +38,7 @@ def index():
                            popular_articles=popular_articles,
                            last_articles=last_articles,
                            auto_count=auto_count,
-                           sellers_count=len(sellers_phones),
+                           sellers_count=sellers_count,
                            cheapened_autos=cheapened_autos,
                            last_searches=last_searches,
                            last_searches_user=last_searches_user)
