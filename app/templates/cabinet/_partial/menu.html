@@ -15,8 +15,8 @@
                 <li class="{%- if active_cabinet_page == "cheapened_autos" %}active{% endif %}">
                     <a href="{{ url_for('cabinet.cheapened_autos') }}">Подешевевшие авто</a>
                 </li>
-                <li>
-                    <a href="#">Баланс и его пополнение</a>
+                <li class="{%- if active_cabinet_page == "billing" %}active{% endif %}">
+                    <a href="{{ url_for('cabinet.billing') }}">Баланс и его пополнение</a>
                 </li>
                 <li>
                     <a href="{{ url_for_security('logout') }}">Выход</a>

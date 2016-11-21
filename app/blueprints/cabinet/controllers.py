@@ -166,7 +166,7 @@ def toggle_delivery_enabled(delivery_id):
     return redirect(url_for('cabinet.deliveries'))
 
 
-@cabinet.route('/cabinet/deliveries/delete/<delivery_id>/')
+@cabinet.route('/cabinet/deliveries/delete/<delivery_id>/', methods=['GET', 'POST'])
 @login_required
 def delete_delivery(delivery_id):
     """Удаляет рассылку.
@@ -179,3 +179,9 @@ def delete_delivery(delivery_id):
     flash('Рассылка успешно удалена.')
     return redirect(url_for('cabinet.deliveries'))
 
+
+@cabinet.route('/cabinet/billing/')
+def billing():
+    if request.method == 'POST':
+        return 'Платёж успешно прошёл.'
+    return render_template("cabinet/billing.html")
