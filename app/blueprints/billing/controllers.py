@@ -1,5 +1,6 @@
 from flask import Blueprint, request, current_app
 from hashlib import sha1
+from decimal import Decimal
 from app.models import Order
 from app import csrf
 
@@ -46,15 +47,17 @@ def index():
     yahash = YandexMoneyHash(request.form, current_app.config.get('YANDEX_MONEY_SECRET'))
     # Проверка на подлинность запроса
     if yahash.check(request.form['sha1_hash']):
-        order = Order.objects(id=request.form['label']).first()
-        # Проверка на соответствие суммы
-        if float(request.form['withdraw_amount']) < order.sum:
-            return 'INVALID_AMOUNT', 400
+        if request.form['label']:
+            order = Order.objects(id=request.form['label']).first()
+            if order and not order.paid_at:
+                # Проверка на соответствие суммы
+                if float(request.form['withdraw_amount']) < order.sum:
+                    return 'INVALID_AMOUNT', 400
 
-        # Пометка заказа как оплаченного и изменение баланса юзера
-        order.mark_paid()
-        order.user.balance += request.form['withdraw_amount']
-        order.user.save()
-        return True
+                # Пометка заказа как оплаченного и изменение баланса юзера
+                order.mark_paid()
+                order.user.balance += Decimal(request.form['withdraw_amount'])
+                order.user.save()
+                return 'OK', 200
 
     return 'INVALID_REQUEST', 400

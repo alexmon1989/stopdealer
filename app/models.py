@@ -209,12 +209,12 @@ class Order(db.Document):
     Атрибуты:
     - sum: сумма заказа
     - user: id пользователя, создавшего заказ
-    - paided: статус заказа (False - неоплачен, True - оплачен)
+    - paid_at: время оплаты заказа
     - created_at: поле документа, время создания записи
     """
     sum = db.DecimalField(required=True, min_value=0)
     user = db.ReferenceField(User, required=True)
-    paid = db.BooleanField(default=False)
+    paid_at = db.DateTimeField()
     created_at = db.DateTimeField(default=datetime.datetime.now)
 
     meta = {
@@ -223,5 +223,5 @@ class Order(db.Document):
 
     def mark_paid(self):
         """Помечает заказ как оплаченный."""
-        self.paid = True
+        self.paid_at = datetime.datetime.now
         self.save()
