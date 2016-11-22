@@ -182,6 +182,7 @@ def delete_delivery(delivery_id):
 
 
 @cabinet.route('/cabinet/billing/', methods=['GET', 'POST'])
+@login_required
 def billing():
     form = BillingForm(request.form, meta={'locales': ['ru_RU', 'ru']})
 
