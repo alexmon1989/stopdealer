@@ -19,13 +19,50 @@
             {% endwith %}
 
             <div class="col-md-9 col-sm-9">
+                <div class="post">
+                    <div class="post-body">
+                        <p>Ваш текущий баланс: <strong>{{ current_user.balance }} руб.</strong></p>
+                        <p>Вы можете пополнить баланс, используя форму, расположенную ниже. После нажатия на кнопку "Оплатить" вы будете переадресованы на страницу оплаты сервиса <strong>Яндекс.Деньги</strong>.</p>
+                    </div>
+                </div>
+
+
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> Пополнить баланс </a> </h4>
+                        <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> Пополнить баланс</a> </h4>
                     </div>
 
-                    <iframe frameborder="0" allowtransparency="true" scrolling="no" src="https://money.yandex.ru/quickpay/shop-widget?account=410014709934025&quickpay=shop&payment-type-choice=on&mobile-payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5+%D0%B1%D0%B0%D0%BB%D0%B0%D0%BD%D1%81%D0%B0&targets-hint=&default-sum=200&button-text=01&successURL=http%3A%2F%2Fstopdealer.ru%2Fbilling%2F" width="450" height="199"></iframe>
-
+                    <form accept-charset="utf-8" method="post" id="BillingForm" class="form-horizontal" autocomplete="off">
+                        <div class="panel-body">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            {{ render_field(form.receiver) }}
+                            {{ render_field(form.formcomment) }}
+                            {{ render_field(form.shortdest) }}
+                            {{ render_field(form.successURL) }}
+                            {{ render_field(form.quickpayform) }}
+                            {{ render_field(form.targets) }}
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Сумма</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.sum, class='form-control', with_label=True) }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Способ оплаты</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.paymentType, with_label=True) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-custom"><i class="fa fa-ruble"></i> Оплатить</button>
+                                    <button type="reset" class="btn btn-default"><i class="fa fa-close"></i> Сброс</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 

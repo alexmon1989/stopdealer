@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from flask_security import login_required, roles_required, current_user
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, current_app
+from flask_security import login_required, current_user
 from flask_security.utils import encrypt_password
-from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm
+from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm, BillingForm
 from app.models import CheapenedAuto, Delivery, Automobile
 from datetime import date, datetime, timedelta
+from urllib.parse import urlencode
 
 cabinet = Blueprint('cabinet', __name__)
 
@@ -102,7 +103,7 @@ def deliveries():
                            deliveries_count=len(deliveries_list))
 
 
-@cabinet.route('/cabinet/deliveries/create',  methods=['GET', 'POST'])
+@cabinet.route('/cabinet/deliveries/create', methods=['GET', 'POST'])
 def create_delivery():
     """Отображает страницу создания рассылки, обрабатывает POST-запроса на создание рассылки"""
     # Если у пользователя 10 и больше рассылок, то запрет на создание
@@ -180,8 +181,20 @@ def delete_delivery(delivery_id):
     return redirect(url_for('cabinet.deliveries'))
 
 
-@cabinet.route('/cabinet/billing/')
+@cabinet.route('/cabinet/billing/', methods=['GET', 'POST'])
 def billing():
-    if request.method == 'POST':
-        return 'Платёж успешно прошёл.'
-    return render_template("cabinet/billing.html")
+    form = BillingForm(request.form, meta={'locales': ['ru_RU', 'ru']})
+
+    if request.method == 'POST' and form.validate():
+        # Переадресация на Яндекс.Деньги
+        url = 'https://money.yandex.ru/quickpay/confirm.xml?{}'.format(urlencode(form.data))
+        return redirect(url)
+
+    # Заполнение некоторых полей формы дефолтными значениями
+    form.receiver.default = current_app.config.get('YANDEX_MONEY_ACCOUNT')
+    form.formcomment.default = current_app.config.get('YANDEX_MONEY_FORMCOMMENT')
+    form.shortdest.default = current_app.config.get('YANDEX_MONEY_FORMCOMMENT')
+    form.successURL.default = url_for('cabinet.billing', _external=True)
+    form.process()
+
+    return render_template("cabinet/billing.html", form=form)

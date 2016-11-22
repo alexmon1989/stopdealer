@@ -1,4 +1,6 @@
-from wtforms import Form, StringField, SelectField, IntegerField, PasswordField, validators, ValidationError
+from wtforms import Form, StringField, RadioField, SelectField, IntegerField, PasswordField, HiddenField, validators, \
+    ValidationError
+from flask import current_app, url_for
 
 
 class DetailsForm(Form):
@@ -46,3 +48,18 @@ class DeliveryForm(Form):
                                                                         ('роботизированная', 'Роботизированная'),
                                                                         ('вариатор', 'Вариатор')))
 
+
+class BillingForm(Form):
+    """Класс формы для пополнения баланса"""
+    receiver = HiddenField('Receiver', [validators.DataRequired()])
+    formcomment = HiddenField('Form comment', [validators.DataRequired()])
+    shortdest = HiddenField('Short dest', [validators.DataRequired()])
+    quickpayform = HiddenField('Quickpay form', [validators.DataRequired()], default='shop')
+    targets = HiddenField('Targets', [validators.DataRequired()], default='Оплата услуг')
+    paymentType = RadioField('Способ оплаты',  [validators.DataRequired()],
+                             choices=(('PC', 'Яндекс.Деньгами'),
+                                      ('AC', 'Банковской картой'),
+                                      ('MC', 'С баланса мобильного')),
+                             default='PC')
+    sum = IntegerField('Сумма', [validators.DataRequired()], default=200)
+    successURL = HiddenField('successURL', [validators.DataRequired()])
