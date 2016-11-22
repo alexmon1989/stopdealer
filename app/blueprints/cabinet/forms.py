@@ -1,6 +1,5 @@
-from wtforms import Form, StringField, RadioField, SelectField, IntegerField, PasswordField, HiddenField, validators, \
-    ValidationError
-from flask import current_app, url_for
+from wtforms import Form, StringField, RadioField, SelectField, IntegerField, PasswordField, HiddenField, DecimalField,\
+    validators, ValidationError
 
 
 class DetailsForm(Form):
@@ -61,5 +60,5 @@ class BillingForm(Form):
                                       ('AC', 'Банковской картой'),
                                       ('MC', 'С баланса мобильного')),
                              default='PC')
-    sum = IntegerField('Сумма', [validators.DataRequired()], default=200)
+    sum = DecimalField('Сумма, руб.', [validators.DataRequired()], default=200)
     successURL = HiddenField('successURL', [validators.DataRequired()])

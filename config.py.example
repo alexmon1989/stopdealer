@@ -126,3 +126,4 @@ SECURITY_EMAIL_SUBJECT_PASSWORD_NOTICE = 'Ваш пароль был измен�
 
 YANDEX_MONEY_ACCOUNT = '410014709934025'
 YANDEX_MONEY_FORMCOMMENT = 'Оплата услуг stopdealer.ru'
+YANDEX_MONEY_SECRET = 'yandex_money_secret'

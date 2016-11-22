@@ -82,6 +82,7 @@ def create_app(**config_overrides):
     from .blueprints.cabinet.controllers import cabinet
     from .blueprints.phone.controllers import phone
     from .blueprints.automobile.controllers import automobile
+    from .blueprints.billing.controllers import billing
 
     # Sample HTTP error handling
     @app.errorhandler(404)
@@ -97,6 +98,7 @@ def create_app(**config_overrides):
     app.register_blueprint(cabinet)
     app.register_blueprint(phone)
     app.register_blueprint(automobile)
+    app.register_blueprint(billing)
 
     @app.context_processor
     def my_utility_processor():

@@ -201,3 +201,27 @@ class Delivery(db.Document):
     meta = {
         'collection': 'deliveries'
     }
+
+
+class Order(db.Document):
+    """Модель отвечает за взамодействие с коллекцией *orders* (оплаты)
+
+    Атрибуты:
+    - sum: сумма заказа
+    - user: id пользователя, создавшего заказ
+    - paided: статус заказа (False - неоплачен, True - оплачен)
+    - created_at: поле документа, время создания записи
+    """
+    sum = db.DecimalField(required=True, min_value=0)
+    user = db.ReferenceField(User, required=True)
+    paid = db.BooleanField(default=False)
+    created_at = db.DateTimeField(default=datetime.datetime.now)
+
+    meta = {
+        'collection': 'orders'
+    }
+
+    def mark_paid(self):
+        """Помечает заказ как оплаченный."""
+        self.paid = True
+        self.save()

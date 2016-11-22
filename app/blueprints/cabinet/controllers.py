@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_security import login_required, current_user
 from flask_security.utils import encrypt_password
 from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm, BillingForm
-from app.models import CheapenedAuto, Delivery
+from app.models import CheapenedAuto, Delivery, Order
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
@@ -186,6 +186,9 @@ def billing():
     form = BillingForm(request.form, meta={'locales': ['ru_RU', 'ru']})
 
     if request.method == 'POST' and form.validate():
+        # Создание заказа
+        order = Order(sum=int(form.sum.data), user=current_user.id).save()
+
         # Переадресация на Яндекс.Деньги
         form_data = {
             'receiver': form.receiver.data,
@@ -196,6 +199,7 @@ def billing():
             'paymentType': form.paymentType.data,
             'sum': form.sum.data,
             'successURL': form.successURL.data,
+            'label': order.id
         }
         url = 'https://money.yandex.ru/quickpay/confirm.xml?{}'.format(urlencode(form_data))
         return redirect(url, code=307)
