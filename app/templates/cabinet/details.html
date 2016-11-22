@@ -14,7 +14,11 @@
         {% include "_messages.html" %}
 
         <div class="row">
-            {% include "cabinet/_partial/menu.html" %}
+            <div class="col-md-3 col-sm-3">
+                {% include "cabinet/_partial/balance.html" %}
+
+                {% include "cabinet/_partial/menu.html" %}
+            </div>
 
             <div class="col-md-9 col-sm-9">
                 <div class="panel panel-default">
