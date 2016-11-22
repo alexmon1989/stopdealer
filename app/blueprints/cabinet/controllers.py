@@ -187,8 +187,8 @@ def billing():
 
     if request.method == 'POST' and form.validate():
         # Переадресация на Яндекс.Деньги
-        url = 'https://money.yandex.ru/quickpay/confirm.xml?{}'.format(urlencode(form.data))
-        return redirect(url)
+        url = 'https://money.yandex.ru/quickpay/confirm.xml'
+        return redirect(url, code=307)
 
     # Заполнение некоторых полей формы дефолтными значениями
     form.receiver.default = current_app.config.get('YANDEX_MONEY_ACCOUNT')
