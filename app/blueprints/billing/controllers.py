@@ -1,6 +1,7 @@
 from flask import Blueprint, request, current_app
 from hashlib import sha1
 from app.models import Order
+from app import csrf
 
 
 billing = Blueprint('billing', __name__)
@@ -38,6 +39,7 @@ class YandexMoneyHash:
         return self.make() == check
 
 
+@csrf.exempt
 @billing.route('/billing/confirm/', methods=['POST'])
 def index():
     """Обрабатывает POST-запрос от сервиса Яндекс.Деньги."""
@@ -45,7 +47,6 @@ def index():
     # Проверка на подлинность запроса
     if yahash.check(request.form['sha1_hash']):
         order = Order.objects(id=request.form['label']).first()
-
         # Проверка на соответствие суммы
         if float(request.form['withdraw_amount']) < order.sum:
             return 'INVALID_AMOUNT', 400

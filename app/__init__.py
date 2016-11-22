@@ -14,6 +14,9 @@ from app.admin import admin
 # Объект mailer для импорта
 mail = Mail()
 
+# Объект csrf для импорта
+csrf = CsrfProtect()
+
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 
 
@@ -25,7 +28,7 @@ def create_app(**config_overrides):
 
     # CSRF
     if app.config.get('CSRF_ENABLED'):
-        CsrfProtect(app)
+        csrf.init_app(app)
 
     # Debugger
     if app.config.get('DEBUG'):
