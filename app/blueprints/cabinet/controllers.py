@@ -213,3 +213,12 @@ def billing():
     form.process()
 
     return render_template("cabinet/billing.html", form=form)
+
+
+@cabinet.route('/cabinet/tariff/', methods=['GET', 'POST'])
+@login_required
+def tariff():
+    user_tariff = current_user.last_tariff
+    if not user_tariff:
+        user_tariff = 'Демо'
+    return render_template("cabinet/tariff.html", tariff=user_tariff)

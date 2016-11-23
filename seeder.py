@@ -2,6 +2,7 @@
 from app.models import Page, Blog, User
 from app import create_app, user_datastore
 from flask_security.utils import encrypt_password
+import datetime
 
 
 # Очистка коллекций БД
@@ -64,7 +65,8 @@ def seed_users():
     user_datastore.create_user(
         email='alex.mon1989@gmail.com',
         username='Монастырецкий Александр Николаевич',
-        password=encrypt_password('123OLOLO123')
+        password=encrypt_password('123OLOLO123'),
+        confirmed_at=datetime.datetime.now
     )
     user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'admin')
     user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'user')

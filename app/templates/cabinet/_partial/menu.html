@@ -6,10 +6,13 @@
         <ul class="author-menus">
             {% set active_cabinet_page = active_cabinet_page|default('details') -%}
             <li class="{%- if active_cabinet_page == "details" %}active{% endif %}">
-                <a href="{{ url_for('cabinet.details') }}">Детали профиля</a>
+                <a href="{{ url_for('cabinet.details') }}">Мой профиль</a>
+            </li>
+            <li class="{%- if active_cabinet_page == "tariff" %}active{% endif %}">
+                <a href="{{ url_for('cabinet.tariff') }}">Мой тариф</a>
             </li>
             <li class="{%- if active_cabinet_page == "deliveries" %}active{% endif %}">
-                <a href="{{ url_for('cabinet.deliveries') }}">Рассылки</a>
+                <a href="{{ url_for('cabinet.deliveries') }}">Мои рассылки</a>
             </li>
             <li class="{%- if active_cabinet_page == "cheapened_autos" %}active{% endif %}">
                 <a href="{{ url_for('cabinet.cheapened_autos') }}">Подешевевшие авто</a>

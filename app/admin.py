@@ -405,7 +405,7 @@ class AdminOrdersModelView(MyModelView):
     def get_query(self):
         """Фильтр по умолчанию: отображаются только оплаченные заказы."""
         return self.model.objects(paid_at__ne=None)
-    
+
 # Инициализация админ. панели
 admin = Admin(name='Stopdealer',
               template_mode='bootstrap3',

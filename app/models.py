@@ -86,6 +86,30 @@ class Price(db.Document):
     }
 
 
+class Tariff(db.Document):
+    """Модель отвечает за взаимодействие с коллекцией *tariffs*
+
+    Атрибуты:
+    - title: название тарифа
+    - price: стоимость тарифа (в рублях)
+    = duration: продолжительность действия тарифа
+    - created_at: поле документа, время создания записи
+    - updated_at: поле документа, время последнего редактирования записи
+    """
+    title = db.StringField(required=True)
+    price = db.DecimalField(required=True, min_value=0)
+    duration = db.IntField(required=True, min_value=0)
+    created_at = db.DateTimeField(default=datetime.datetime.now)
+    updated_at = db.DateTimeField(default=datetime.datetime.now)
+
+    meta = {
+        'collection': 'tariffs'
+    }
+
+    def __str__(self):
+        return self.title
+
+
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)
@@ -111,6 +135,8 @@ class User(db.Document, UserMixin):
     last_login_at = db.DateTimeField(max_length=255)
     login_count = db.IntField()
     roles = db.ListField(db.ReferenceField(Role), default=[])
+    last_tariff = db.ReferenceField(Tariff, default=None)
+    tariff_expires_at = db.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(days=7))
     created_at = db.DateTimeField(default=datetime.datetime.now)
     updated_at = db.DateTimeField(default=datetime.datetime.now)
 
@@ -225,3 +251,4 @@ class Order(db.Document):
         """Помечает заказ как оплаченный."""
         self.paid_at = datetime.datetime.now
         self.save()
+

@@ -1,0 +1,43 @@
+{% extends "layout/master.html" %}
+
+{% from "macros.html" import render_field with context %}
+
+{% block title %}Кабинет пользователя{% endblock %}
+
+{% block content %}
+
+{% include "layout/_partial/header.html" %}
+{% include "layout/_partial/hero.html" %}
+
+<section class="main">
+    <div class="container">
+        {% include "_messages.html" %}
+
+        <div class="row">
+            <div class="col-md-3 col-sm-3">
+                {% include "cabinet/_partial/balance.html" %}
+
+                {% with active_cabinet_page='tariff' %}
+                    {% include "cabinet/_partial/menu.html" %}
+                {% endwith %}
+            </div>
+
+            <div class="col-md-9 col-sm-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> Мой тариф </a> </h4>
+                    </div>
+
+                    <div class="panel-body">
+                        <p>Текущий тариф: <strong>{{ tariff }}</strong>, действителен до {{ current_user.tariff_expires_at }}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% include 'layout/_partial/footer.html' %}
+
+{% endblock %}
