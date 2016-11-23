@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, current_app
 from flask_security import login_required, current_user
 from flask_security.utils import encrypt_password
-from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm, BillingForm
-from app.models import CheapenedAuto, Delivery, Order
+from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm, BillingForm, TariffForm
+from app.models import CheapenedAuto, Delivery, Order, Tariff
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
@@ -218,7 +218,35 @@ def billing():
 @cabinet.route('/cabinet/tariff/', methods=['GET', 'POST'])
 @login_required
 def tariff():
-    user_tariff = current_user.last_tariff
-    if not user_tariff:
-        user_tariff = 'Демо'
-    return render_template("cabinet/tariff.html", tariff=user_tariff)
+    form = None
+    if datetime.now() < current_user.tariff_expires_at:
+        user_tariff = current_user.last_tariff
+        if not user_tariff:
+            user_tariff = 'Демо'
+    else:
+        user_tariff = None
+        form = TariffForm(request.form, meta={'locales': ['ru_RU', 'ru']})
+
+        choices = [(x.id, x.title +
+                    ' (' + str(x.duration) +
+                    ' дней, <strong>' +
+                    str(x.price) +
+                    ' руб.</strong>)')
+                   for x in Tariff.objects(enabled=True).order_by('price')]
+        if choices:
+            form.tariff.choices = choices
+        form.tariff.default = request.args.get('tariff', choices[0][0])
+
+        if request.method == 'POST' and form.validate():
+            selected_tariff = Tariff.objects(id=form.tariff.data).first()
+            current_user.tariff_expires_at = datetime.now() + timedelta(days=selected_tariff.duration)
+            current_user.last_tariff = selected_tariff
+            current_user.balance -= selected_tariff.price
+            current_user.save()
+            # Переадресация с сообщением об успехе
+            flash('Тариф успешно активирован. Вы можете пользоваться всеми услугами сайта.')
+            return redirect(url_for('cabinet.tariff'))
+
+    return render_template("cabinet/tariff.html",
+                           user_tariff=user_tariff,
+                           form=form)

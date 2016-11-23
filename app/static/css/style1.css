@@ -974,12 +974,12 @@ ul.author-menus > li.active a {
 	}
 }
 
-ul#paymentType {
+ul#paymentType, ul#tariff {
     list-style: outside none none;
     margin-top: 5px;
     padding-left: 0;
 }
 
-ul#paymentType li label {
+ul#paymentType li label, ul#tariff li label {
     font-weight: normal;
 }

@@ -29,11 +29,42 @@
                     </div>
 
                     <div class="panel-body">
-                        <p>Текущий тариф: <strong>{{ tariff }}</strong>, действителен до {{ current_user.tariff_expires_at }}</p>
+                        {% if user_tariff %}
+                            <p>Текущий тариф: <strong>{{ user_tariff }}</strong>, действителен до {{ current_user.tariff_expires_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+                        {% else %}
+                            <p>Тариф не активирован. Активируйте любой в форме ниже.</p>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
 
+                {% if not user_tariff %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> Выбор тарифа </a> </h4>
+                    </div>
+
+                    <form accept-charset="utf-8" method="post" id="UserProfileForm" class="form-horizontal" autocomplete="off">
+                        <div class="panel-body">
+                            <p>Будьте внимательны! После нажатия кнопки "Сохранить" с вашего счёта будет списана соответствующая сумма.</p>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Выберите тариф</label>
+                                <div class="col-sm-9">
+                                    {{ render_field(form.tariff, with_label=True) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-custom"><i class="fa fa-save"></i> Сохранить</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>

@@ -96,9 +96,10 @@ class Tariff(db.Document):
     - created_at: поле документа, время создания записи
     - updated_at: поле документа, время последнего редактирования записи
     """
-    title = db.StringField(required=True)
+    title = db.StringField(max_length=255, required=True)
     price = db.DecimalField(required=True, min_value=0)
     duration = db.IntField(required=True, min_value=0)
+    enabled = db.BooleanField(default=True)
     created_at = db.DateTimeField(default=datetime.datetime.now)
     updated_at = db.DateTimeField(default=datetime.datetime.now)
 
