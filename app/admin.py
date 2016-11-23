@@ -1,10 +1,9 @@
-from .models import User, Blog, Page, Search, Delivery
+from .models import User, Blog, Page, Search, Delivery, Order
 from wtforms import TextAreaField, PasswordField, validators
 from wtforms.widgets import TextArea
-from flask import url_for, redirect, request, abort, flash
+from flask import url_for, redirect, request, abort
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.base import MenuLink
-from flask_admin.babel import gettext
 from flask_admin.contrib.mongoengine import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_security import current_user
@@ -14,9 +13,6 @@ from slugify import slugify
 import datetime
 import os.path as op
 from flask_admin.contrib.mongoengine.filters import BaseMongoEngineFilter
-from flask_admin.form import FormOpts
-from flask_admin.helpers import get_redirect_target
-from flask_admin.model.helpers import get_mdict_item_or_list
 
 
 # CKEditor
@@ -380,8 +376,38 @@ class AdminDeliveriesModelView(MyModelView):
                       'model')
 
 
+class FilterUser(BaseMongoEngineFilter):
+    """Кастомный фильтр для поиска по E-Mail пользователей."""
+    def apply(self, query, value, alias=None):
+        user_ids = [user.id for user in User.objects(email=value)]
+        return query.filter(user__in=user_ids)
+
+    def operation(self):
+        return 'Равно'
+
+
+class AdminOrdersModelView(MyModelView):
+    """ModelView Для администрирования подписок"""
+    form_base_class = FlaskForm
+    can_view_details = True
+    can_delete = True
+    can_edit = False
+    can_create = False
+    column_labels = dict(user='Пользователь',
+                         sum='Сумма',
+                         created_at='Создано',
+                         paid_at='Оплачено')
+    column_formatters = dict(user=lambda v, c, m, p: m.user.email,
+                             created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             paid_at=lambda v, c, m, p: m.paid_at.strftime('%d.%m.%Y %H:%M:%S'))
+    column_filters = (FilterUser(column=Order.user, name='Пользователь (E-Mail)'), 'sum', 'paid_at', 'created_at')
+
+    def get_query(self):
+        """Фильтр по умолчанию: отображаются только оплаченные заказы."""
+        return self.model.objects(paid_at__ne=None)
+    
 # Инициализация админ. панели
-admin = Admin(name='Автодилеры',
+admin = Admin(name='Stopdealer',
               template_mode='bootstrap3',
               index_view=MyHomeView(menu_icon_type='glyph', menu_icon_value='glyphicon-home'))
 admin.add_view(AdminPagesModelView(Page,
@@ -400,6 +426,10 @@ admin.add_view(AdminDeliveriesModelView(Delivery,
                                         name='Подписки',
                                         menu_icon_type='glyph',
                                         menu_icon_value='glyphicon-tasks'))
+admin.add_view(AdminOrdersModelView(Order,
+                                    name='Оплаты',
+                                    menu_icon_type='glyph',
+                                    menu_icon_value='glyphicon-ruble'))
 admin.add_view(AdminUserModelView(User,
                                   name='Пользователи',
                                   menu_icon_type='glyph',

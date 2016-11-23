@@ -4,5 +4,7 @@
     </div>
     <div class="widget-body">
         <p>Ваш баланс: <strong>{{ current_user.balance }} руб.</strong></p>
+
+        <a class="btn btn-primary btn-sm" href="{{ url_for('cabinet.billing') }}"><i class="fa fa-ruble"></i> Пополнить</a>
     </div>
 </div>
