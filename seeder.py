@@ -62,6 +62,7 @@ def seed_blog():
 def seed_users():
     user_datastore.find_or_create_role(name='admin', description='Администратор')
     user_datastore.find_or_create_role(name='user', description='Пользователь')
+    user_datastore.find_or_create_role(name='vip', description='VIP')
     user_datastore.create_user(
         email='alex.mon1989@gmail.com',
         username='Монастырецкий Александр Николаевич',
@@ -70,6 +71,7 @@ def seed_users():
     )
     user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'admin')
     user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'user')
+    user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'vip')
 
 
 if __name__ == "__main__":
