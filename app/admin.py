@@ -132,9 +132,12 @@ class AdminUserModelView(MyModelView):
                          current_login_ip='IP при текущей авторизации',
                          last_login_ip='IP при последней авторизации',
                          login_count='Заходил, раз',
+                         last_tariff='Тариф',
+                         tariff_expires_at='Время истечения срока тарифа',
                          created_at='Создано',
                          updated_at='Последнее редактирование')
     column_formatters = dict(current_login_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             tariff_expires_at=lambda v, c, m, p: m.tariff_expires_at.strftime('%d.%m.%Y %H:%M:%S'),
                              created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
                              updated_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'))
     form_excluded_columns = ('created_at',
@@ -165,8 +168,11 @@ class AdminUserModelView(MyModelView):
         'active': {
             'label': 'Профиль включён',
         },
-        'roles': {
-            'label': 'Роли',
+        'last_tariff': {
+            'label': 'Тариф',
+        },
+        'tariff_expires_at': {
+            'label': 'Время истечения срока тарифа',
         }
     }
     form_widget_args = {
