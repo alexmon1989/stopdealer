@@ -1,4 +1,4 @@
-from .models import User, Blog, Page, Search, Delivery, Order, Tariff
+from .models import User, Blog, Page, Search, Delivery, Order, Tariff, Settings
 from wtforms import TextAreaField, PasswordField, validators
 from wtforms.widgets import TextArea
 from flask import url_for, redirect, request, abort
@@ -121,6 +121,7 @@ class AdminUserModelView(MyModelView):
                            'current_login_at',
                            'last_login_at',
                            'tariff_expires_at',
+                           'deliveries_count',
                            'last_tariff')
     column_labels = dict(email='E-Mail',
                          username='Имя пользователя',
@@ -134,6 +135,7 @@ class AdminUserModelView(MyModelView):
                          login_count='Заходил, раз',
                          last_tariff='Тариф',
                          tariff_expires_at='Время истечения срока тарифа',
+                         deliveries_count='Количество купленных подписок',
                          created_at='Создано',
                          updated_at='Последнее редактирование')
     column_formatters = dict(current_login_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'),
@@ -173,6 +175,9 @@ class AdminUserModelView(MyModelView):
         },
         'tariff_expires_at': {
             'label': 'Время истечения срока тарифа',
+        },
+        'deliveries_count': {
+            'label': 'Количество купленных подписок',
         }
     }
     form_widget_args = {
@@ -372,10 +377,12 @@ class AdminDeliveriesModelView(MyModelView):
                          transmission='КПП',
                          enabled='Вкл.',
                          created_at='Создано',
+                         expires_at='Истекает',
                          last_letter_at='Последнее письмо')
     column_formatters = dict(user_id=lambda v, c, m, p: m.user_id.email,
                              created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
                              updated_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             expires_at=lambda v, c, m, p: m.expires_at.strftime('%d.%m.%Y %H:%M:%S'),
                              last_letter_at=lambda v, c, m, p: m.last_letter_at.strftime('%d.%m.%Y %H:%M:%S'))
     column_editable_list = ('enabled',)
     column_filters = (FilterUserId(column=Delivery.user_id, name='Пользователь (E-Mail)'),
@@ -455,6 +462,29 @@ class AdminTariffModelView(MyModelView):
         model.updated_at = datetime.datetime.now
 
 
+class AdminSettingsModelView(MyModelView):
+    """ModelView для администрирования тарифов"""
+    form_base_class = FlaskForm
+    can_delete = False
+    can_edit = True
+    can_create = False
+    column_labels = dict(title='Название настройки',
+                         value='Значение')
+    form_args = {
+        'value': {
+            'label': 'Значение',
+            'validators': [validators.required()]
+        },
+    }
+    form_excluded_columns = ('title', 'key')
+    column_exclude_list = ('key',)
+    column_formatters = dict(
+        value=lambda v, c, m, p: m.value.replace('True', 'Да').replace('False', 'Нет')
+        if m.value in ('True', 'False')
+        else m.value
+    )
+
+
 # Инициализация админ. панели
 admin = Admin(name='Stopdealer',
               template_mode='bootstrap3',
@@ -487,6 +517,10 @@ admin.add_view(AdminUserModelView(User,
                                   name='Пользователи',
                                   menu_icon_type='glyph',
                                   menu_icon_value='glyphicon-user'))
+admin.add_view(AdminSettingsModelView(Settings,
+                                      name='Настройки',
+                                      menu_icon_type='glyph',
+                                      menu_icon_value='glyphicon-cog'))
 path = op.join(op.dirname(__file__), 'static', 'uploads')
 admin.add_view(FileAdmin(path,
                          '/static/uploads/',

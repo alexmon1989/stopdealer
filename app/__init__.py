@@ -110,6 +110,10 @@ def create_app(**config_overrides):
             """ returns the formated datetime """
             return datetime.datetime.now().strftime(format)
 
-        return dict(date_now=date_now)
+        def datetime_now():
+            """ returns the datetime """
+            return datetime.datetime.now()
+
+        return dict(date_now=date_now, datetime_now=datetime_now)
 
     return app

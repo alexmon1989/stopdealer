@@ -138,6 +138,7 @@ class User(db.Document, UserMixin):
     roles = db.ListField(db.ReferenceField(Role), default=[])
     last_tariff = db.ReferenceField(Tariff, default=None)
     tariff_expires_at = db.DateTimeField(default=datetime.datetime.now() + datetime.timedelta(days=7))
+    deliveries_count = db.IntField(min_value=0, default=0)
     created_at = db.DateTimeField(default=datetime.datetime.now)
     updated_at = db.DateTimeField(default=datetime.datetime.now)
 
@@ -209,6 +210,7 @@ class Delivery(db.Document):
     - transmission: тип коробки передач
     - enabled: включена ли рассылка
     - last_letter_at: последния отправка письма по этой рассылке
+    - last_letter_at: дата истечения срока подписки
     - created_at: поле документа, время создания записи
     - updated_at: поле документа, время изменения записи
     """
@@ -222,6 +224,7 @@ class Delivery(db.Document):
     transmission = db.StringField()
     enabled = db.BooleanField(default=True)
     last_letter_at = db.DateTimeField(default=datetime.datetime.now)
+    expires_at = db.DateTimeField(default=datetime.datetime.now)
     created_at = db.DateTimeField(default=datetime.datetime.now)
     updated_at = db.DateTimeField(default=datetime.datetime.now)
 
@@ -253,3 +256,15 @@ class Order(db.Document):
         self.paid_at = datetime.datetime.now
         self.save()
 
+
+class Settings(db.Document):
+    """Модель отвечает за взамодействие с коллекцией *settings* (настройки)
+
+    Атрибуты:
+    - key: ключ
+    - title: текстовое название ключа
+    - value: значение
+    """
+    key = db.StringField(required=True, max_length=255, unique=True)
+    title = db.StringField(required=True, max_length=255, unique=True)
+    value = db.StringField(required=True, max_length=255)

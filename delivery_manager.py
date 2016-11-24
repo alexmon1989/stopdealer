@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     with app.app_context():
         # Получение активных рассылок
-        deliveries = Delivery.objects(enabled=True)
+        deliveries = Delivery.objects(enabled=True, expires_at__gt=datetime.now())
 
         with mail.connect() as conn:
             for delivery in deliveries:
