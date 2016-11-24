@@ -39,32 +39,34 @@
                     </div>
                     <div class="widget-body">
                         {% if automobiles %}
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Автомобиль</th>
-                                    <th>Год выпуска</th>
-                                    <th>Пробег</th>
-                                    <th>Город</th>
-                                    <th>Стоимость</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for auto in automobiles %}
-                                <tr>
-                                    <td>{{ auto.created_at.strftime('%d.%m.%Y') }}</td>
-                                    <td>{{ auto.props['manufacturer'] }}&nbsp;{{ auto.props['model'] }}</td>
-                                    <td>{{ auto.props['Год выпуска'] }}</td>
-                                    <td>{{ auto.props['Пробег'] }}</td>
-                                    <td>{{ auto.props['Город продажи'] }}</td>
-                                    <td>{{ '{:,}'.format(auto.get_price()).replace(',', ' ') }} руб.</td>
-                                    <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=auto.id) }}">Смотреть</a></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="table-container">
+                            <table class="table table-striped no-margin">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Автомобиль</th>
+                                        <th>Год выпуска</th>
+                                        <th>Пробег</th>
+                                        <th>Город</th>
+                                        <th>Стоимость</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for auto in automobiles %}
+                                    <tr>
+                                        <td>{{ auto.created_at.strftime('%d.%m.%Y') }}</td>
+                                        <td>{{ auto.props['manufacturer'] }}&nbsp;{{ auto.props['model'] }}</td>
+                                        <td>{{ auto.props['Год выпуска'] }}</td>
+                                        <td>{{ auto.props['Пробег'] }}</td>
+                                        <td>{{ auto.props['Город продажи'] }}</td>
+                                        <td>{{ '{:,}'.format(auto.get_price()).replace(',', ' ') }} руб.</td>
+                                        <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=auto.id) }}">Смотреть</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                         {% else %}
                             <p>Информация не найдена</p>
                         {% endif %}
@@ -79,4 +81,23 @@
 
 {% include 'layout/_partial/footer.html' %}
 
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.css') }}" />
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+    <script>
+        $(function () {
+            $(".table-container").mCustomScrollbar({
+                axis:"x",
+                theme: 'dark-3',
+                scrollButtons: {
+                    enable: true
+                }
+            });
+        });
+    </script>
 {% endblock %}

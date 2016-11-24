@@ -97,29 +97,30 @@
                     <div class="panel-heading">
                         <h4 class="panel-title">Результаты</h4>
                     </div>
-
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Автомобиль</th>
-                                <th>Год выпуска</th>
-                                <th>Подешевел на</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in cheapened_autos.items %}
-                            <tr>
-                                <td>{{ item.created_at.strftime('%d.%m.%Y') }}</td>
-                                <td>{{ item.automobile.props['manufacturer'] }}&nbsp;{{ item.automobile.props['model'] }}</td>
-                                <td>{{ item.automobile.props['Год выпуска'] }} г.в.</td>
-                                <td>{{ item.fell_by }} руб.</td>
-                                <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=item.automobile._id) }}">Смотреть</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="table-container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Автомобиль</th>
+                                    <th>Год выпуска</th>
+                                    <th>Подешевел на</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cheapened_autos.items %}
+                                <tr>
+                                    <td>{{ item.created_at.strftime('%d.%m.%Y') }}</td>
+                                    <td>{{ item.automobile.props['manufacturer'] }}&nbsp;{{ item.automobile.props['model'] }}</td>
+                                    <td>{{ item.automobile.props['Год выпуска'] }} г.в.</td>
+                                    <td>{{ item.fell_by }} руб.</td>
+                                    <td><a class="btn btn-custom btn-block" href="{{ url_for('automobile.index', auto_id=item.automobile._id) }}">Смотреть</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="text-center">{{ render_pagination(cheapened_autos, 'cabinet.cheapened_autos') }}</div>
                 </div>
@@ -137,8 +138,21 @@
     <script src="{{ url_for('static', filename='plugins/moment/min/moment-with-locales.min.js') }}"></script>
     <script src="{{ url_for('static', filename='plugins/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/pages/cabinet/cheapened_autos.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.concat.min.js') }}"></script>
+    <script>
+        $(function () {
+            $(".table-container").mCustomScrollbar({
+                axis:"x",
+                theme: 'dark-3',
+                scrollButtons: {
+                    enable: true
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='plugins/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/malihu-custom-scrollbar-plugin-3.1.5/jquery.mCustomScrollbar.css') }}" />
 {% endblock %}
