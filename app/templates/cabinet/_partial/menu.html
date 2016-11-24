@@ -1,27 +1,25 @@
-<div class="col-md-3 col-sm-3">
-    <div class="widget">
-        <div class="widget-header">
-            <h3>Меню</h3>
-        </div>
-        <div class="widget-body">
-            <ul class="author-menus">
-                {% set active_cabinet_page = active_cabinet_page|default('details') -%}
-                <li class="{%- if active_cabinet_page == "details" %}active{% endif %}">
-                    <a href="{{ url_for('cabinet.details') }}">Детали профиля</a>
-                </li>
-                <li class="{%- if active_cabinet_page == "deliveries" %}active{% endif %}">
-                    <a href="{{ url_for('cabinet.deliveries') }}">Рассылки</a>
-                </li>
-                <li class="{%- if active_cabinet_page == "cheapened_autos" %}active{% endif %}">
-                    <a href="{{ url_for('cabinet.cheapened_autos') }}">Подешевевшие авто</a>
-                </li>
-                <li>
-                    <a href="#">Баланс и его пополнение</a>
-                </li>
-                <li>
-                    <a href="{{ url_for_security('logout') }}">Выход</a>
-                </li>
-            </ul>
-        </div>
+<div class="widget">
+    <div class="widget-header">
+        <h3>Меню</h3>
+    </div>
+    <div class="widget-body">
+        <ul class="author-menus">
+            {% set active_cabinet_page = active_cabinet_page|default('details') -%}
+            <li class="{%- if active_cabinet_page == "details" %}active{% endif %}">
+                <a href="{{ url_for('cabinet.details') }}">Мой профиль</a>
+            </li>
+            <li class="{%- if active_cabinet_page == "tariff" %}active{% endif %}">
+                <a href="{{ url_for('cabinet.tariff') }}">Мой тариф</a>
+            </li>
+            <li class="{%- if active_cabinet_page == "deliveries" %}active{% endif %}">
+                <a href="{{ url_for('cabinet.deliveries') }}">Мои рассылки</a>
+            </li>
+            <li class="{%- if active_cabinet_page == "cheapened_autos" %}active{% endif %}">
+                <a href="{{ url_for('cabinet.cheapened_autos') }}">Подешевевшие авто</a>
+            </li>
+            <li>
+                <a href="{{ url_for_security('logout') }}">Выход</a>
+            </li>
+        </ul>
     </div>
 </div>

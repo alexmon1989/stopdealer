@@ -1,4 +1,8 @@
-from wtforms import Form, StringField, SelectField, IntegerField, PasswordField, validators, ValidationError
+from wtforms import Form, StringField, RadioField, SelectField, IntegerField, PasswordField, HiddenField, DecimalField,\
+    validators, ValidationError
+from flask_security import current_user
+from bson.objectid import ObjectId
+from app.models import Tariff
 
 
 class DetailsForm(Form):
@@ -46,3 +50,34 @@ class DeliveryForm(Form):
                                                                         ('роботизированная', 'Роботизированная'),
                                                                         ('вариатор', 'Вариатор')))
 
+
+class BillingForm(Form):
+    """Класс формы для пополнения баланса"""
+    receiver = HiddenField('Receiver', [validators.DataRequired()])
+    formcomment = HiddenField('Form comment', [validators.DataRequired()])
+    shortdest = HiddenField('Short dest', [validators.DataRequired()])
+    quickpayform = HiddenField('Quickpay form', [validators.DataRequired()], default='shop')
+    targets = HiddenField('Targets', [validators.DataRequired()], default='Оплата услуг')
+    paymentType = RadioField('Способ оплаты',  [validators.DataRequired()],
+                             choices=(('PC', 'Яндекс.Деньгами'),
+                                      ('AC', 'Банковской картой'),
+                                      ('MC', 'С баланса мобильного')),
+                             default='PC')
+    sum = DecimalField('Сумма, руб.', [validators.DataRequired()], default=200)
+    successURL = HiddenField('successURL', [validators.DataRequired()])
+
+
+def my_enough_balance(form, field):
+    """Проверяет хватает ли средств на балансе пользователя для приобретения конкретного тарифа."""
+    tariff = Tariff.objects(id=field.data).first()
+    if tariff:
+        if tariff.price > current_user.balance:
+            raise ValidationError('У вас не хватает средств для приобретения этого тарифа. '
+                                  'Пополните, пожалуйста, баланс!')
+
+
+class TariffForm(Form):
+    """Класс формы для выбора тарифа."""
+    tariff = RadioField('Выберите подходящий вам тариф',
+                        [validators.DataRequired(), my_enough_balance],
+                        coerce=ObjectId)

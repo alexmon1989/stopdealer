@@ -1,10 +1,9 @@
-from .models import User, Blog, Page, Search, Delivery
+from .models import User, Blog, Page, Search, Delivery, Order, Tariff, Settings
 from wtforms import TextAreaField, PasswordField, validators
 from wtforms.widgets import TextArea
-from flask import url_for, redirect, request, abort, flash
+from flask import url_for, redirect, request, abort
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.base import MenuLink
-from flask_admin.babel import gettext
 from flask_admin.contrib.mongoengine import ModelView
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_security import current_user
@@ -14,9 +13,6 @@ from slugify import slugify
 import datetime
 import os.path as op
 from flask_admin.contrib.mongoengine.filters import BaseMongoEngineFilter
-from flask_admin.form import FormOpts
-from flask_admin.helpers import get_redirect_target
-from flask_admin.model.helpers import get_mdict_item_or_list
 
 
 # CKEditor
@@ -123,7 +119,10 @@ class AdminUserModelView(MyModelView):
                            'login_count',
                            'last_login_ip',
                            'current_login_at',
-                           'last_login_at')
+                           'last_login_at',
+                           'tariff_expires_at',
+                           'deliveries_count',
+                           'last_tariff')
     column_labels = dict(email='E-Mail',
                          username='Имя пользователя',
                          balance='Баланс, руб.',
@@ -134,9 +133,13 @@ class AdminUserModelView(MyModelView):
                          current_login_ip='IP при текущей авторизации',
                          last_login_ip='IP при последней авторизации',
                          login_count='Заходил, раз',
+                         last_tariff='Тариф',
+                         tariff_expires_at='Время истечения срока тарифа',
+                         deliveries_count='Количество купленных подписок',
                          created_at='Создано',
                          updated_at='Последнее редактирование')
     column_formatters = dict(current_login_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             tariff_expires_at=lambda v, c, m, p: m.tariff_expires_at.strftime('%d.%m.%Y %H:%M:%S'),
                              created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
                              updated_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'))
     form_excluded_columns = ('created_at',
@@ -167,8 +170,14 @@ class AdminUserModelView(MyModelView):
         'active': {
             'label': 'Профиль включён',
         },
-        'roles': {
-            'label': 'Роли',
+        'last_tariff': {
+            'label': 'Тариф',
+        },
+        'tariff_expires_at': {
+            'label': 'Время истечения срока тарифа',
+        },
+        'deliveries_count': {
+            'label': 'Количество купленных подписок',
         }
     }
     form_widget_args = {
@@ -368,10 +377,12 @@ class AdminDeliveriesModelView(MyModelView):
                          transmission='КПП',
                          enabled='Вкл.',
                          created_at='Создано',
+                         expires_at='Истекает',
                          last_letter_at='Последнее письмо')
     column_formatters = dict(user_id=lambda v, c, m, p: m.user_id.email,
                              created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
                              updated_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             expires_at=lambda v, c, m, p: m.expires_at.strftime('%d.%m.%Y %H:%M:%S'),
                              last_letter_at=lambda v, c, m, p: m.last_letter_at.strftime('%d.%m.%Y %H:%M:%S'))
     column_editable_list = ('enabled',)
     column_filters = (FilterUserId(column=Delivery.user_id, name='Пользователь (E-Mail)'),
@@ -380,8 +391,102 @@ class AdminDeliveriesModelView(MyModelView):
                       'model')
 
 
+class FilterUser(BaseMongoEngineFilter):
+    """Кастомный фильтр для поиска по E-Mail пользователей."""
+    def apply(self, query, value, alias=None):
+        user_ids = [user.id for user in User.objects(email=value)]
+        return query.filter(user__in=user_ids)
+
+    def operation(self):
+        return 'Равно'
+
+
+class AdminOrdersModelView(MyModelView):
+    """ModelView для администрирования оплат"""
+    form_base_class = FlaskForm
+    can_view_details = True
+    can_delete = True
+    can_edit = False
+    can_create = False
+    column_labels = dict(user='Пользователь',
+                         sum='Сумма',
+                         created_at='Создано',
+                         paid_at='Оплачено')
+    column_formatters = dict(user=lambda v, c, m, p: m.user.email,
+                             created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             paid_at=lambda v, c, m, p: m.paid_at.strftime('%d.%m.%Y %H:%M:%S'))
+    column_filters = (FilterUser(column=Order.user, name='Пользователь (E-Mail)'), 'sum', 'paid_at', 'created_at')
+
+    def get_query(self):
+        """Фильтр по умолчанию: отображаются только оплаченные заказы."""
+        return self.model.objects(paid_at__ne=None)
+
+
+class AdminTariffModelView(MyModelView):
+    """ModelView для администрирования тарифов"""
+    form_base_class = FlaskForm
+    can_view_details = True
+    can_delete = False
+    can_edit = True
+    can_create = True
+    column_labels = dict(title='Название',
+                         price='Стоимость, руб.',
+                         duration='Продолжительность, дней',
+                         enabled='Активирован?',
+                         created_at='Создано',
+                         updated_at='Последнее редактирование')
+    column_editable_list = ('enabled',)
+    form_args = {
+        'title': {
+            'label': 'Название',
+            'validators': [validators.required()]
+        },
+        'price': {
+            'label': 'Стоимость, руб.',
+            'validators': [validators.required()]
+        },
+        'duration': {
+            'label': 'Продолжительность действия, дней',
+            'validators': [validators.required()]
+        },
+        'enabled': {
+            'label': 'Активирован? (отображается ли в списке выбора)',
+        }
+    }
+    form_excluded_columns = ('created_at', 'updated_at')
+    column_formatters = dict(created_at=lambda v, c, m, p: m.created_at.strftime('%d.%m.%Y %H:%M:%S'),
+                             updated_at=lambda v, c, m, p: m.updated_at.strftime('%d.%m.%Y %H:%M:%S'))
+    column_filters = ('title', 'enabled', 'price', 'duration', 'created_at', 'updated_at')
+
+    def on_model_change(self, form, model, is_created):
+        model.updated_at = datetime.datetime.now
+
+
+class AdminSettingsModelView(MyModelView):
+    """ModelView для администрирования тарифов"""
+    form_base_class = FlaskForm
+    can_delete = False
+    can_edit = True
+    can_create = False
+    column_labels = dict(title='Название настройки',
+                         value='Значение')
+    form_args = {
+        'value': {
+            'label': 'Значение',
+            'validators': [validators.required()]
+        },
+    }
+    form_excluded_columns = ('title', 'key')
+    column_exclude_list = ('key',)
+    column_formatters = dict(
+        value=lambda v, c, m, p: m.value.replace('True', 'Да').replace('False', 'Нет')
+        if m.value in ('True', 'False')
+        else m.value
+    )
+
+
 # Инициализация админ. панели
-admin = Admin(name='Автодилеры',
+admin = Admin(name='Stopdealer',
               template_mode='bootstrap3',
               index_view=MyHomeView(menu_icon_type='glyph', menu_icon_value='glyphicon-home'))
 admin.add_view(AdminPagesModelView(Page,
@@ -400,10 +505,22 @@ admin.add_view(AdminDeliveriesModelView(Delivery,
                                         name='Подписки',
                                         menu_icon_type='glyph',
                                         menu_icon_value='glyphicon-tasks'))
+admin.add_view(AdminTariffModelView(Tariff,
+                                    name='Тарифы',
+                                    menu_icon_type='glyph',
+                                    menu_icon_value='glyphicon-flash'))
+admin.add_view(AdminOrdersModelView(Order,
+                                    name='Оплаты',
+                                    menu_icon_type='glyph',
+                                    menu_icon_value='glyphicon-ruble'))
 admin.add_view(AdminUserModelView(User,
                                   name='Пользователи',
                                   menu_icon_type='glyph',
                                   menu_icon_value='glyphicon-user'))
+admin.add_view(AdminSettingsModelView(Settings,
+                                      name='Настройки',
+                                      menu_icon_type='glyph',
+                                      menu_icon_value='glyphicon-cog'))
 path = op.join(op.dirname(__file__), 'static', 'uploads')
 admin.add_view(FileAdmin(path,
                          '/static/uploads/',

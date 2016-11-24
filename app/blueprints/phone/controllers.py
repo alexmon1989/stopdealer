@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request
-from app.models import Automobile, Search
+from flask import Blueprint, render_template, request, abort, flash, redirect, url_for
+from app.models import Automobile, Search, Settings
 from flask_security import current_user, login_required
+from datetime import datetime
 
 phone = Blueprint('phone', __name__)
 
@@ -9,6 +10,15 @@ phone = Blueprint('phone', __name__)
 @login_required
 def index():
     """Отображет индексную страницу модуля"""
+    if not request.args.get('phone'):
+        return abort(404)
+
+    # Проверка может ли пользователь производить поиск
+    if Settings.objects(key='ENABLE_PAY_PHONE_SEARCH').only('value').first().value == 'True':
+        if not current_user.has_role('vip') and current_user.tariff_expires_at < datetime.now():
+            flash('Поиск доступен для пользователей, активировавших платный тариф.')
+            return redirect(url_for('cabinet.tariff'))
+
     # Получение номера телефона и приведение его к виду без спец. символов, пробелов и кода +7
     phone_num = request.args.get('phone')\
         .replace('+8', '')\

@@ -1,7 +1,8 @@
 # coding: utf-8
-from app.models import Page, Blog, User
+from app.models import Page, Blog, User, Settings
 from app import create_app, user_datastore
 from flask_security.utils import encrypt_password
+import datetime
 
 
 # Очистка коллекций БД
@@ -9,6 +10,7 @@ def clear_db():
     Page.objects.delete()
     Blog.objects.delete()
     User.objects.delete()
+    Settings.objects.delete()
 
 
 # Заполнение коллекции pages
@@ -57,17 +59,39 @@ def seed_blog():
         ).save()
 
 
+# Заполнение коллекции settings
+def seed_settings():
+    Settings(
+        key='ENABLE_PAY_PHONE_SEARCH',
+        title='Включить платный поиск по номерам телефонов',
+        value='False'
+    ).save()
+    Settings(
+        key='ENABLE_PAY_DELIVERIES',
+        title='Включить платные рассылки',
+        value='True'
+    ).save()
+    Settings(
+        key='ONE_DELIVERY_PRICE',
+        title='Стоимость одной рассылки, руб.',
+        value='20'
+    ).save()
+
+
 # Заполнение коллекции users
 def seed_users():
     user_datastore.find_or_create_role(name='admin', description='Администратор')
     user_datastore.find_or_create_role(name='user', description='Пользователь')
+    user_datastore.find_or_create_role(name='vip', description='VIP')
     user_datastore.create_user(
         email='alex.mon1989@gmail.com',
         username='Монастырецкий Александр Николаевич',
-        password=encrypt_password('123OLOLO123')
+        password=encrypt_password('123OLOLO123'),
+        confirmed_at=datetime.datetime.now
     )
     user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'admin')
     user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'user')
+    user_datastore.add_role_to_user('alex.mon1989@gmail.com', 'vip')
 
 
 if __name__ == "__main__":
@@ -81,3 +105,5 @@ if __name__ == "__main__":
         seed_blog()
         print('Заполнение коллекции users...')
         seed_users()
+        print('Заполнение коллекции settings...')
+        seed_settings()

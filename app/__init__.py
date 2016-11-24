@@ -14,6 +14,9 @@ from app.admin import admin
 # Объект mailer для импорта
 mail = Mail()
 
+# Объект csrf для импорта
+csrf = CsrfProtect()
+
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 
 
@@ -25,7 +28,7 @@ def create_app(**config_overrides):
 
     # CSRF
     if app.config.get('CSRF_ENABLED'):
-        CsrfProtect(app)
+        csrf.init_app(app)
 
     # Debugger
     if app.config.get('DEBUG'):
@@ -82,6 +85,7 @@ def create_app(**config_overrides):
     from .blueprints.cabinet.controllers import cabinet
     from .blueprints.phone.controllers import phone
     from .blueprints.automobile.controllers import automobile
+    from .blueprints.billing.controllers import billing
 
     # Sample HTTP error handling
     @app.errorhandler(404)
@@ -97,6 +101,7 @@ def create_app(**config_overrides):
     app.register_blueprint(cabinet)
     app.register_blueprint(phone)
     app.register_blueprint(automobile)
+    app.register_blueprint(billing)
 
     @app.context_processor
     def my_utility_processor():
@@ -105,6 +110,10 @@ def create_app(**config_overrides):
             """ returns the formated datetime """
             return datetime.datetime.now().strftime(format)
 
-        return dict(date_now=date_now)
+        def datetime_now():
+            """ returns the datetime """
+            return datetime.datetime.now()
+
+        return dict(date_now=date_now, datetime_now=datetime_now)
 
     return app

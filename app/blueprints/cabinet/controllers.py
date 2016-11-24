@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from flask_security import login_required, roles_required, current_user
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, current_app
+from flask_security import login_required, current_user
 from flask_security.utils import encrypt_password
-from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm
-from app.models import CheapenedAuto, Delivery, Automobile
+from .forms import DetailsForm, CheapenedAutosForm, DeliveryForm, BillingForm, TariffForm
+from app.models import CheapenedAuto, Delivery, Order, Tariff, Settings
 from datetime import date, datetime, timedelta
+from urllib.parse import urlencode
+from decimal import Decimal
 
 cabinet = Blueprint('cabinet', __name__)
 
@@ -90,23 +92,45 @@ def get_models(manufacturer):
                           .distinct(field='automobile.props.model')))
 
 
-@cabinet.route('/cabinet/deliveries/page/')
+@cabinet.route('/cabinet/deliveries/')
 @login_required
 def deliveries():
     """Отображает страницу Рассылки"""
-    deliveries_list = Delivery.objects(user_id=current_user.get_id()).order_by('-created_at')
+    deliveries_list = Delivery.objects(user_id=current_user.get_id(),
+                                       expires_at__gt=datetime.now()).order_by('-created_at')
+    delivery_price = Settings.objects(key='ONE_DELIVERY_PRICE').only('value').first().value
+
+    enable_pay_deliveries = Settings.objects(key='ENABLE_PAY_DELIVERIES').only('value').first().value == 'True'
+    cant_create_delivery = enable_pay_deliveries \
+                           and not current_user.has_role('vip') \
+                           and current_user.tariff_expires_at < datetime.now() \
+                           and current_user.deliveries_count == 0
 
     # Отображение страницы
     return render_template("cabinet/deliveries/index.html",
                            deliveries=deliveries_list,
-                           deliveries_count=len(deliveries_list))
+                           delivery_price=delivery_price,
+                           cant_create_delivery=cant_create_delivery,
+                           deliveries_count=len(deliveries_list),
+                           enable_pay_deliveries=enable_pay_deliveries)
 
 
-@cabinet.route('/cabinet/deliveries/create',  methods=['GET', 'POST'])
+@cabinet.route('/cabinet/deliveries/create', methods=['GET', 'POST'])
+@login_required
 def create_delivery():
     """Отображает страницу создания рассылки, обрабатывает POST-запроса на создание рассылки"""
-    # Если у пользователя 10 и больше рассылок, то запрет на создание
-    if len(Delivery.objects(user_id=current_user.get_id())) > 9:
+    # Если пользователь не активировал тариф, не VIP и у него нет приобретённых рассылок
+    # Проверка может ли пользователь производить поиск
+    if Settings.objects(key='ENABLE_PAY_DELIVERIES').only('value').first().value == 'True':
+        if not current_user.has_role('vip')\
+                and current_user.tariff_expires_at < datetime.now() \
+                and current_user.deliveries_count == 0:
+            flash('У вас не актививирован тариф и/или нет купленных рассылок. '
+                  'Вы можете купить рассылку или активировать платный тариф для пользования услугой рассылки.')
+            return redirect(url_for('cabinet.deliveries'))
+
+    # Если у пользователя 10 и больше рассылок (и он не VIP), то запрет на создание
+    if not current_user.has_role('vip') and len(Delivery.objects(user_id=current_user.get_id())) > 9:
         flash('Невозможно создать рассылку, т.к. у вас есть 10 созданных рассылок. '
               'Для создания новой удалите одну или более из "старых" рассылок.')
         return redirect(url_for('cabinet.deliveries'))
@@ -131,6 +155,12 @@ def create_delivery():
     form.year_to.default = request.args.get('year_to')
 
     if request.method == 'POST' and form.validate():
+        # Дата окончания срока подписки.
+        # Если тариф активирован, то это дата конца тарифа, если нет - то +7 дней от текущего времени
+        expires_at = current_user.tariff_expires_at \
+            if datetime.now() < current_user.tariff_expires_at \
+            else datetime.now() + timedelta(days=7)
+
         # Создание рассылки
         Delivery(user_id=current_user.get_id(),
                  manufacturer=form.manufacturer.data,
@@ -139,8 +169,15 @@ def create_delivery():
                  year_to=form.year_to.data,
                  price_from=form.price_from.data.replace(' ', ''),
                  price_to=form.price_to.data.replace(' ', ''),
-                 transmission=form.transmission.data
+                 transmission=form.transmission.data,
+                 expires_at=expires_at
                  ).save()
+
+        enable_pay_deliveries = Settings.objects(key='ENABLE_PAY_DELIVERIES').only('value').first().value == 'True'
+        # Признак того, что создали купленную заявку
+        if enable_pay_deliveries and datetime.now() > current_user.tariff_expires_at:
+            current_user.deliveries_count -= 1
+            current_user.save()
 
         # Переадресация с сообщением об успехе
         flash('Рассылка успешно создана. '
@@ -166,7 +203,31 @@ def toggle_delivery_enabled(delivery_id):
     return redirect(url_for('cabinet.deliveries'))
 
 
-@cabinet.route('/cabinet/deliveries/delete/<delivery_id>/')
+@cabinet.route('/cabinet/deliveries/buy-one-delivery/')
+@login_required
+def buy_one_delivery():
+    enable_pay_deliveries = Settings.objects(key='ENABLE_PAY_DELIVERIES').only('value').first().value == 'True'
+    if enable_pay_deliveries:
+        delivery_price = Decimal(Settings.objects(key='ONE_DELIVERY_PRICE').only('value').first().value)
+        if current_user.deliveries_count < 10:
+            if current_user.balance >= delivery_price:
+                current_user.deliveries_count += 1
+                current_user.balance -= delivery_price
+                current_user.save()
+                flash('Вы приобрели одну рассылку!')
+            else:
+                flash('У вас недостаточно средств на балансе для приобретения одной рассылки. '
+                      'Пожалуйста, пополните баланс!')
+                return redirect(url_for('cabinet.billing'))
+        else:
+            flash('Нельзя купить более 10 подписок!')
+    else:
+        flash('Сейчас подписки являются бесплатными!')
+
+    return redirect(url_for('cabinet.deliveries'))
+
+
+@cabinet.route('/cabinet/deliveries/delete/<delivery_id>/', methods=['GET', 'POST'])
 @login_required
 def delete_delivery(delivery_id):
     """Удаляет рассылку.
@@ -179,3 +240,73 @@ def delete_delivery(delivery_id):
     flash('Рассылка успешно удалена.')
     return redirect(url_for('cabinet.deliveries'))
 
+
+@cabinet.route('/cabinet/billing/', methods=['GET', 'POST'])
+@login_required
+def billing():
+    form = BillingForm(request.form, meta={'locales': ['ru_RU', 'ru']})
+
+    if request.method == 'POST' and form.validate():
+        # Создание заказа
+        order = Order(sum=int(form.sum.data), user=current_user.id).save()
+
+        # Переадресация на Яндекс.Деньги
+        form_data = {
+            'receiver': form.receiver.data,
+            'formcomment': form.formcomment.data,
+            'short-dest': form.shortdest.data,
+            'quickpay-form': form.quickpayform.data,
+            'targets': form.targets.data,
+            'paymentType': form.paymentType.data,
+            'sum': form.sum.data,
+            'successURL': form.successURL.data,
+            'label': order.id
+        }
+        url = 'https://money.yandex.ru/quickpay/confirm.xml?{}'.format(urlencode(form_data))
+        return redirect(url, code=307)
+
+    # Заполнение некоторых полей формы дефолтными значениями
+    form.receiver.default = current_app.config.get('YANDEX_MONEY_ACCOUNT')
+    form.formcomment.default = current_app.config.get('YANDEX_MONEY_FORMCOMMENT')
+    form.shortdest.default = current_app.config.get('YANDEX_MONEY_FORMCOMMENT')
+    form.successURL.default = url_for('cabinet.billing', _external=True)
+    form.process()
+
+    return render_template("cabinet/billing.html", form=form)
+
+
+@cabinet.route('/cabinet/tariff/', methods=['GET', 'POST'])
+@login_required
+def tariff():
+    form = None
+    if datetime.now() < current_user.tariff_expires_at:
+        user_tariff = current_user.last_tariff
+        if not user_tariff:
+            user_tariff = 'Демо'
+    else:
+        user_tariff = None
+        form = TariffForm(request.form, meta={'locales': ['ru_RU', 'ru']})
+
+        choices = [(x.id, x.title +
+                    ' (' + str(x.duration) +
+                    ' дней, <strong>' +
+                    str(x.price) +
+                    ' руб.</strong>)')
+                   for x in Tariff.objects(enabled=True).order_by('price')]
+        if choices:
+            form.tariff.choices = choices
+        form.tariff.default = request.args.get('tariff', choices[0][0])
+
+        if request.method == 'POST' and form.validate():
+            selected_tariff = Tariff.objects(id=form.tariff.data).first()
+            current_user.tariff_expires_at = datetime.now() + timedelta(days=selected_tariff.duration)
+            current_user.last_tariff = selected_tariff
+            current_user.balance -= selected_tariff.price
+            current_user.save()
+            # Переадресация с сообщением об успехе
+            flash('Тариф успешно активирован. Вы можете пользоваться всеми услугами сайта.')
+            return redirect(url_for('cabinet.tariff'))
+
+    return render_template("cabinet/tariff.html",
+                           user_tariff=user_tariff,
+                           form=form)

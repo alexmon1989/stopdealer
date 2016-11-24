@@ -14,18 +14,53 @@
         {% include "_messages.html" %}
 
         <div class="row">
-            {% with active_cabinet_page='deliveries' %}
-                {% include "cabinet/_partial/menu.html" %}
-            {% endwith %}
+            <div class="col-md-3 col-sm-3">
+                {% include "cabinet/_partial/balance.html" %}
+
+                {% with active_cabinet_page='deliveries' %}
+                    {% include "cabinet/_partial/menu.html" %}
+                {% endwith %}
+            </div>
 
             <div class="col-md-9 col-sm-9">
+                <div class="post">
+                    <div class="post-body">
+                        Наш сайт предоставляет услугу по рассылкам новых объявлений по продаже автомобилей. Таким образом вам не нужно самостоятельно "мониторить" сайт автопродаж и ждать пока там появится интересующий вас автомобиль, наш сервис всё сделает за вас!
+                    </div>
+                </div>
+
+
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title"> <a href="#collapseB1" data-toggle="collapse"> E-Mail рассылки </a> </h4>
                     </div>
 
                     <div class="panel-body">
-                        <p><a class="btn btn-custom" href="{{ url_for('cabinet.create_delivery') }}"><i class="fa fa-plus"></i> Создать</a></p>
+                        {% if cant_create_delivery %}
+
+                            <p>Вы не можете создать новую рассылку, т.к. у вас не актививирован тариф и/или нет купленных рассылок. Вы можете купить рассылку или активировать платный тариф для пользования услугой рассылки.</p>
+
+                            <p><a href="{{ url_for('cabinet.tariff') }}" class="btn btn-success">Активировать тариф</a>&nbsp;<a href="{{ url_for('cabinet.buy_one_delivery') }}" class="btn btn-warning">Купить одну рассылку (7 дней, {{ delivery_price }} руб.)</a></p>
+
+                        {% else %}
+                            <p>Доступно рассылок для создания: <strong>
+                                {% if current_user.has_role('vip') %}
+                                    &infin;
+                                {% else %}
+                                    {% if enable_pay_deliveries and current_user.tariff_expires_at < datetime_now() %}
+                                        {{ current_user.deliveries_count - deliveries_count }} (всего неиспользованных: {{ current_user.deliveries_count }})
+                                    {% else %}
+                                        {{ 10 - deliveries_count }}
+                                    {% endif %}
+                                {% endif %}</strong>
+                            </p>
+
+                            {% if current_user.tariff_expires_at < datetime_now() %}
+                                <p><a href="{{ url_for('cabinet.buy_one_delivery') }}" class="btn btn-warning">Купить одну рассылку (7 дней, {{ delivery_price }} руб.)</a></p>
+                            {% endif %}
+
+                            <p><a class="btn btn-custom" href="{{ url_for('cabinet.create_delivery') }}"><i class="fa fa-plus"></i> Создать</a></p>
+                        {% endif %}
 
                         {% if deliveries_count %}
                             <div class="table-container">
@@ -42,6 +77,7 @@
                                             <th>КПП</th>
                                             <th title="Включено">Вкл.</th>
                                             <th>Создано</th>
+                                            <th>Истекает</th>
                                             <th>&nbsp;</th>
                                         </tr>
                                     </thead>
@@ -58,6 +94,7 @@
                                             <td>{{ delivery.transmission }}</td>
                                             <td><a href="{{ url_for('cabinet.toggle_delivery_enabled', delivery_id=delivery.id) }}" title="{% if delivery.enabled %}Отключить{% else %}Включить{% endif %}">{% if delivery.enabled %}<b>Да</b>{% else %}Нет{% endif %}</a></td>
                                             <td>{{ delivery.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                                            <td>{{ delivery.expires_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
                                             <td><a class="btn btn-danger btn-xs delete" href="{{ url_for('cabinet.delete_delivery', delivery_id=delivery.id) }}">Удалить</a></td>
                                         </tr>
                                         {% endfor %}

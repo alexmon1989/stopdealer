@@ -973,3 +973,13 @@ ul.author-menus > li.active a {
 		width: 330px;
 	}
 }
+
+ul#paymentType, ul#tariff {
+    list-style: outside none none;
+    margin-top: 5px;
+    padding-left: 0;
+}
+
+ul#paymentType li label, ul#tariff li label {
+    font-weight: normal;
+}

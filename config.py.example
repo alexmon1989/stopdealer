@@ -123,3 +123,7 @@ SECURITY_MSG_REFRESH = (
         'Please reauthenticate to access this page.', 'info')
 SECURITY_EMAIL_SUBJECT_PASSWORD_RESET = 'Сброс пароля'
 SECURITY_EMAIL_SUBJECT_PASSWORD_NOTICE = 'Ваш пароль был изменён'
+
+YANDEX_MONEY_ACCOUNT = '410014709934025'
+YANDEX_MONEY_FORMCOMMENT = 'Оплата услуг stopdealer.ru'
+YANDEX_MONEY_SECRET = 'yandex_money_secret'
