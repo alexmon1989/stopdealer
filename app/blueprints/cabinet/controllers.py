@@ -104,6 +104,7 @@ def deliveries():
 
 
 @cabinet.route('/cabinet/deliveries/create', methods=['GET', 'POST'])
+@login_required
 def create_delivery():
     """Отображает страницу создания рассылки, обрабатывает POST-запроса на создание рассылки"""
     # Если у пользователя 10 и больше рассылок, то запрет на создание
