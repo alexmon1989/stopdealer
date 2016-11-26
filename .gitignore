@@ -3,3 +3,4 @@
 *.py[cod]
 /.env/
 /config.py
+/app/static/robots.txt
