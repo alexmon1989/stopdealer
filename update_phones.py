@@ -12,4 +12,6 @@ for x in collection.find():
             .replace('(', '')\
             .replace(')', '')\
             .replace(' ', '')
+        if phone[0] in ['7', '8']:
+            phone = phone[1:]
         collection.update({'_id': x['_id']}, {'$set': {'seller.phone': phone}})
