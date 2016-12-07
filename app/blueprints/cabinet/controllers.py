@@ -174,8 +174,10 @@ def create_delivery():
                  ).save()
 
         enable_pay_deliveries = Settings.objects(key='ENABLE_PAY_DELIVERIES').only('value').first().value == 'True'
-        # Признак того, что создали купленную заявку
-        if enable_pay_deliveries and datetime.now() > current_user.tariff_expires_at:
+        # Признак того, что создали купленную заявку (кроме ВИП-юзеров)
+        if not current_user.has_role('vip') \
+                and enable_pay_deliveries \
+                and datetime.now() > current_user.tariff_expires_at:
             current_user.deliveries_count -= 1
             current_user.save()
 
